@@ -6,7 +6,14 @@
 
   <title>Lotto Pattern Lab</title>
 
-  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/grid.css" />
+  <link rel="stylesheet" href="./css/stats.css" />
+  <link rel="stylesheet" href="./css/generator.css" />
+  <link rel="stylesheet" href="./css/footer.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
 </head>
 <body>
   <header class="app-header">
@@ -47,10 +54,26 @@
     </section>
 
     <section class="panel wide-panel">
-      <div class="section-heading">
+      <div class="section-heading recent-heading">
         <div>
           <p class="eyebrow">Recent results</p>
-          <h2>Recent 10 Draws</h2>
+          <h2>Recent Draws</h2>
+        </div>
+
+        <div class="recent-controls">
+          <label class="recent-count-label">
+            Draw count
+            <input id="recentDrawCount" type="number" min="1" step="1" value="10" />
+          </label>
+
+          <div class="view-toggle" role="group" aria-label="Recent draw view mode">
+            <button id="tableViewBtn" class="view-toggle-btn active" type="button">
+              Table View
+            </button>
+            <button id="compactViewBtn" class="view-toggle-btn" type="button">
+              Compact View
+            </button>
+          </div>
         </div>
       </div>
 

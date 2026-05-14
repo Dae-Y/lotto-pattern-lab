@@ -7,7 +7,7 @@ import {
 
 import { parseLotteryCsv } from "./parsers/lotteryParser.js";
 import { renderTabs } from "./renderers/tabsRenderer.js";
-import { renderRecentGrid } from "./renderers/gridRenderer.js";
+import { renderRecentResults } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
@@ -16,6 +16,8 @@ const state = {
   activeGameId: DEFAULT_GAME_ID,
   drawsByGameId: {},
   sourceByGameId: {},
+  recentDrawLimit: 10,
+  recentViewMode: "table",
 };
 
 const elements = {
@@ -26,6 +28,9 @@ const elements = {
   status: document.querySelector("#status"),
   compactMeta: document.querySelector("#compactMeta"),
   recentGrid: document.querySelector("#recentGrid"),
+  recentDrawCount: document.querySelector("#recentDrawCount"),
+  tableViewBtn: document.querySelector("#tableViewBtn"),
+  compactViewBtn: document.querySelector("#compactViewBtn"),
   stats: document.querySelector("#stats"),
   generator: document.querySelector("#generator"),
 };
@@ -45,7 +50,42 @@ function init() {
     clearActiveGameData();
   });
 
+  elements.recentDrawCount.addEventListener("input", handleDrawCountChange);
+
+  elements.tableViewBtn.addEventListener("click", () => {
+    setViewMode("table");
+  });
+
+  elements.compactViewBtn.addEventListener("click", () => {
+    setViewMode("compact");
+  });
+
   loadSampleCsvForActiveGame();
+}
+
+function handleDrawCountChange() {
+  const parsed = parseInt(elements.recentDrawCount.value, 10);
+  state.recentDrawLimit = parsed > 0 ? parsed : 1;
+  renderRecent();
+}
+
+function setViewMode(mode) {
+  state.recentViewMode = mode;
+
+  elements.tableViewBtn.classList.toggle("active", mode === "table");
+  elements.compactViewBtn.classList.toggle("active", mode === "compact");
+
+  renderRecent();
+}
+
+function renderRecent() {
+  const config = getGameConfig(state.activeGameId);
+  const draws = state.drawsByGameId[state.activeGameId] ?? [];
+
+  renderRecentResults(elements.recentGrid, draws, config, {
+    limit: state.recentDrawLimit,
+    viewMode: state.recentViewMode,
+  });
 }
 
 function renderAll() {
@@ -54,7 +94,10 @@ function renderAll() {
 
   renderTabs(elements.tabs, GAME_CONFIGS, state.activeGameId, handleTabChange);
   renderCompactMeta(elements.compactMeta, draws, config);
-  renderRecentGrid(elements.recentGrid, draws, config, 10);
+  renderRecentResults(elements.recentGrid, draws, config, {
+    limit: state.recentDrawLimit,
+    viewMode: state.recentViewMode,
+  });
   renderStats(elements.stats, draws, config);
   renderGenerator(elements.generator, config);
 }

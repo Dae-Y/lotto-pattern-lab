@@ -1,0 +1,116 @@
+/* ── Random Draw Simulator ── */
+
+.generator-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.generator-header h2 {
+  margin: 4px 0 6px;
+}
+
+.generator-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.generator-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.generator-btn {
+  border: 1px solid var(--primary);
+  background: #eff6ff;
+  color: var(--primary-dark);
+  border-radius: 12px;
+  min-height: 38px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.generator-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.generated-scroll-area {
+  max-height: 460px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbfcff;
+  padding: 10px;
+}
+
+.generated-scroll-area::-webkit-scrollbar {
+  width: 10px;
+}
+
+.generated-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.generated-scroll-area::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+.generated-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(340px, 560px));
+  justify-content: center;
+  gap: 10px;
+}
+
+.generated-set {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.set-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ball-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.ball-separator {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.generator-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}

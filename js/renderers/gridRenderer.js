@@ -1,7 +1,16 @@
 import { formatDateShort } from "../utils/dateUtils.js";
 import { range } from "../utils/numberUtils.js";
 
-export function renderRecentGrid(container, draws, config, limit = 10) {
+/**
+ * Render recent draw results supporting table and compact view modes.
+ * @param {HTMLElement} container
+ * @param {Array} draws
+ * @param {Object} config
+ * @param {Object} options - { limit: number, viewMode: "table"|"compact" }
+ */
+export function renderRecentResults(container, draws, config, options = {}) {
+  const { limit = 10, viewMode = "table" } = options;
+
   container.innerHTML = "";
 
   if (!draws || draws.length === 0) {
@@ -13,23 +22,97 @@ export function renderRecentGrid(container, draws, config, limit = 10) {
     return;
   }
 
-  const recentDraws = draws.slice(0, limit);
+  const effectiveLimit = Math.min(limit, draws.length);
+  const recentDraws = draws.slice(0, effectiveLimit);
 
-  const legend = createLegend(config);
-  const wrapper = document.createElement("div");
-  wrapper.className = "grid-wrapper";
+  // Warning if requested more than available
+  if (limit > draws.length) {
+    const warning = document.createElement("div");
+    warning.className = "recent-warning";
+    warning.textContent = `Showing ${draws.length.toLocaleString()} available current-format draws. Older rows may use unsupported historical formats.`;
+    container.appendChild(warning);
+  }
 
-  const table = document.createElement("table");
-  table.className = "result-table";
+  // Scroll area wrapper
+  const scrollArea = document.createElement("div");
+  scrollArea.className = "recent-scroll-area";
 
-  table.appendChild(createTableHead(config));
-  table.appendChild(createTableBody(recentDraws, config));
+  if (viewMode === "compact") {
+    scrollArea.appendChild(renderCompactView(recentDraws, config));
+  } else {
+    const legend = createLegend(config);
+    container.appendChild(legend);
 
-  wrapper.appendChild(table);
+    const wrapper = document.createElement("div");
+    wrapper.className = "grid-wrapper";
 
-  container.appendChild(legend);
-  container.appendChild(wrapper);
+    const table = document.createElement("table");
+    table.className = "result-table";
+    table.appendChild(createTableHead(config));
+    table.appendChild(createTableBody(recentDraws, config));
+
+    wrapper.appendChild(table);
+    scrollArea.appendChild(wrapper);
+  }
+
+  container.appendChild(scrollArea);
 }
+
+/* ── Compact View ── */
+
+function renderCompactView(draws, config) {
+  const list = document.createElement("div");
+  list.className = "compact-results";
+
+  const secondaryClass = config.secondary.sharesMainGrid
+    ? "supplementary-ball"
+    : "powerball-ball";
+
+  draws.forEach((draw) => {
+    const row = document.createElement("article");
+    row.className = "compact-draw-row";
+
+    // Meta column
+    const meta = document.createElement("div");
+    meta.className = "compact-draw-meta";
+    meta.innerHTML = `
+      <div class="compact-draw-number">#${draw.drawNumber}</div>
+      <div class="compact-draw-date">${formatDateShort(draw.drawDate)}</div>
+    `;
+
+    // Ball row
+    const ballRow = document.createElement("div");
+    ballRow.className = "compact-ball-row";
+
+    draw.mainNumbers.forEach((number) => {
+      const ball = document.createElement("span");
+      ball.className = "lottery-ball compact-result-ball main-ball";
+      ball.textContent = number;
+      ballRow.appendChild(ball);
+    });
+
+    // Separator
+    const separator = document.createElement("span");
+    separator.className = "compact-separator";
+    separator.textContent = config.secondary.label;
+    ballRow.appendChild(separator);
+
+    draw.secondaryNumbers.forEach((number) => {
+      const ball = document.createElement("span");
+      ball.className = `lottery-ball compact-result-ball ${secondaryClass}`;
+      ball.textContent = number;
+      ballRow.appendChild(ball);
+    });
+
+    row.appendChild(meta);
+    row.appendChild(ballRow);
+    list.appendChild(row);
+  });
+
+  return list;
+}
+
+/* ── Table View Helpers ── */
 
 function createLegend(config) {
   const legend = document.createElement("div");

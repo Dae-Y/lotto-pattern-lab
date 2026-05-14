@@ -1,0 +1,115 @@
+/* ── Buttons, Tabs, File Label, Status, Empty State ── */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.tab-btn {
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+button,
+.file-label {
+  font: inherit;
+}
+
+.primary-btn,
+.secondary-btn,
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.primary-btn {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: var(--primary-dark);
+}
+
+.secondary-btn {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+}
+
+.file-label {
+  border: 1px dashed var(--primary);
+  background: #eff6ff;
+  color: var(--primary-dark);
+}
+
+.file-label input {
+  display: none;
+}
+
+.status-text {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.empty-state {
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  color: var(--muted);
+  background: #fbfcff;
+}
+
+/* ── Shared Lottery Ball Styles ── */
+
+.lottery-ball {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow:
+    inset 0 2px 5px rgba(255, 255, 255, 0.7),
+    0 3px 8px rgba(18, 31, 53, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.main-ball {
+  background: radial-gradient(circle at 35% 30%, #fffdf0 0%, #fff35c 45%, #e0b800 100%);
+  color: #272000;
+}
+
+.powerball-ball {
+  background: radial-gradient(circle at 35% 30%, #eef8ff 0%, #70d6ff 45%, #1f6feb 100%);
+  color: #06203f;
+}
+
+.supplementary-ball {
+  background: radial-gradient(circle at 35% 30%, #f4ffe8 0%, #9be564 45%, #45a832 100%);
+  color: #12330d;
+}

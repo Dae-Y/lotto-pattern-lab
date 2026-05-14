@@ -1,0 +1,101 @@
+/* ── App Header, Shell, Panels, Top Panel ── */
+
+.app-header {
+  padding: 36px 24px 24px;
+  background: linear-gradient(135deg, #182033, #283b63);
+  color: white;
+}
+
+.app-header h1 {
+  margin: 4px 0 8px;
+  font-size: 36px;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.5;
+}
+
+.app-header .eyebrow {
+  color: #a9c7ff;
+}
+
+.app-shell {
+  width: calc(100% - 20px);
+  margin: 24px auto;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.wide-panel {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.top-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.compact-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 260px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.compact-meta strong {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.compact-meta .meta-main {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.compact-meta .meta-source {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  margin: 4px 0 0;
+}

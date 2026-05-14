@@ -1,0 +1,87 @@
+/* ── Responsive Overrides ── */
+
+@media (max-width: 900px) {
+  .stats-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header h1 {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 850px) {
+  .generated-list,
+  .compact-results {
+    grid-template-columns: minmax(0, 560px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 800px) {
+  .top-panel-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compact-meta {
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .compact-meta .meta-source {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .recent-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recent-controls {
+    width: 100%;
+  }
+
+  .compact-draw-row {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-result-ball {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .generator-header {
+    flex-direction: column;
+  }
+
+  .generator-controls {
+    justify-content: flex-start;
+  }
+
+  .generated-set {
+    grid-template-columns: 1fr;
+  }
+
+  .lottery-ball {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .generated-list,
+  .compact-results {
+    grid-template-columns: 1fr;
+  }
+
+  .generated-set,
+  .compact-draw-row {
+    max-width: none;
+  }
+}

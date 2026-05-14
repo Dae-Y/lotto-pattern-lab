@@ -1,0 +1,36 @@
+/* ── CSS Variables & Global Reset ── */
+
+:root {
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --text: #182033;
+  --muted: #697386;
+  --border: #d9dee8;
+  --primary: #1f6feb;
+  --primary-dark: #174ea6;
+  --main-hit: #fff35c;
+  --secondary-hit: #70d6ff;
+  --supplementary-hit: #9be564;
+  --danger: #d64545;
+  --shadow: 0 10px 30px rgba(18, 31, 53, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

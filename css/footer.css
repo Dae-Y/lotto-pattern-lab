@@ -1,0 +1,68 @@
+/* ── Footer & Disclaimer ── */
+
+.app-footer {
+  width: 100%;
+  max-width: none;
+  margin: 22px auto 40px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.disclaimer-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.disclaimer-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.disclaimer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: var(--primary-dark);
+  font-weight: 900;
+}
+
+.disclaimer-header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.disclaimer-body {
+  display: grid;
+  gap: 8px;
+}
+
+.disclaimer-body p {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.disclaimer-body p::before {
+  content: "\203B  ";
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.copyright {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 700;
+}
