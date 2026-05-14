@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Lotto Pattern Lab</title>
+
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Lotterywest CSV Visualiser</p>
+      <h1>Lotto Pattern Lab</h1>
+      <p class="subtitle">
+        Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.
+      </p>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="panel">
+      <div class="tabs" id="tabs"></div>
+
+      <div class="controls">
+        <button id="loadSampleBtn" class="primary-btn">
+          Load CSV from data folder
+        </button>
+
+        <label class="file-label">
+          Upload CSV
+          <input id="csvInput" type="file" accept=".csv,text/csv" />
+        </label>
+
+        <button id="clearBtn" class="secondary-btn">
+          Clear
+        </button>
+      </div>
+
+      <p id="status" class="status-text">
+        Select a game tab, then load a CSV file.
+      </p>
+    </section>
+
+    <section class="summary-grid" id="summary"></section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Recent results</p>
+          <h2>Recent 10 Draws</h2>
+        </div>
+      </div>
+
+      <div id="recentGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Quick analysis</p>
+          <h2>Pattern Summary</h2>
+        </div>
+      </div>
+
+      <div id="stats"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>
+      This project is for data visualisation and pattern exploration only. It does not guarantee lottery results.
+    </p>
+  </footer>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
