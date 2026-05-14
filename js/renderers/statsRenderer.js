@@ -23,15 +23,15 @@ export function renderStats(container, draws, config) {
   layout.className = "stats-layout";
 
   layout.appendChild(
-    createChipCard("Most frequent winning numbers", topMain, "times"),
+    createSortableChipCard("Most frequent winning numbers", topMain, "times", "count"),
   );
 
   layout.appendChild(
-    createChipCard("Least frequent winning numbers", bottomMain, "times"),
+    createSortableChipCard("Least frequent winning numbers", bottomMain, "times", "count"),
   );
 
   layout.appendChild(
-    createChipCard("Most overdue winning numbers", overdueMain, "draws ago"),
+    createSortableChipCard("Most overdue winning numbers", overdueMain, "draws ago", "drawsAgo"),
   );
 
   layout.appendChild(createPatternCard(patternSummary, config));
@@ -40,43 +40,128 @@ export function renderStats(container, draws, config) {
   const overdueSecondary = getOverdueNumbers(draws, config, "secondary", 10);
 
   layout.appendChild(
-    createChipCard(`Most frequent ${config.secondary.label}`, topSecondary, "times"),
+    createSortableChipCard(`Most frequent ${config.secondary.label}`, topSecondary, "times", "count"),
   );
 
   layout.appendChild(
-    createChipCard(`Most overdue ${config.secondary.label}`, overdueSecondary, "draws ago"),
+    createSortableChipCard(`Most overdue ${config.secondary.label}`, overdueSecondary, "draws ago", "drawsAgo"),
   );
 
   container.appendChild(layout);
 }
 
-function createChipCard(title, items, suffix) {
+/**
+ * Creates a chip card with ▲▼ sort controls and ranking labels.
+ * @param {string} title - Card heading text
+ * @param {Array} items - Data items with number and count/drawsAgo
+ * @param {string} suffix - Display suffix ("times" or "draws ago")
+ * @param {string} sortKey - "count" or "drawsAgo"
+ */
+function createSortableChipCard(title, items, suffix, sortKey) {
   const card = document.createElement("article");
   card.className = "stat-card";
+
+  // Header row: title + sort buttons
+  const header = document.createElement("div");
+  header.className = "stat-card-header";
 
   const heading = document.createElement("h3");
   heading.textContent = title;
 
+  const controls = document.createElement("span");
+  controls.className = "sort-controls";
+
+  const btnAsc = document.createElement("button");
+  btnAsc.type = "button";
+  btnAsc.className = "sort-btn";
+  btnAsc.textContent = "\u25B2";
+  btnAsc.title = "Sort ascending";
+  btnAsc.setAttribute("aria-label", "Sort ascending");
+
+  const btnDesc = document.createElement("button");
+  btnDesc.type = "button";
+  btnDesc.className = "sort-btn active";
+  btnDesc.textContent = "\u25BC";
+  btnDesc.title = "Sort descending";
+  btnDesc.setAttribute("aria-label", "Sort descending");
+
+  controls.appendChild(btnAsc);
+  controls.appendChild(btnDesc);
+
+  header.appendChild(heading);
+  header.appendChild(controls);
+
+  // Chip list
   const chipList = document.createElement("div");
   chipList.className = "chip-list";
 
-  items.forEach((item) => {
-    const chip = document.createElement("span");
-    chip.className = "number-chip";
-
-    const value =
-      item.drawsAgo === null
-        ? "never"
-        : item.count ?? item.drawsAgo;
-
-    chip.innerHTML = `<strong>${item.number}</strong> ${value} ${suffix}`;
-    chipList.appendChild(chip);
-  });
-
-  card.appendChild(heading);
+  card.appendChild(header);
   card.appendChild(chipList);
 
+  // Current sort direction: "desc" by default (matches initial data order)
+  let currentDirection = "desc";
+
+  function renderChips(direction) {
+    const sorted = [...items].sort((a, b) => {
+      const aVal = getSortValue(a, sortKey);
+      const bVal = getSortValue(b, sortKey);
+
+      return direction === "asc" ? aVal - bVal : bVal - aVal;
+    });
+
+    chipList.innerHTML = "";
+
+    sorted.forEach((item, index) => {
+      const chip = document.createElement("span");
+      chip.className = "number-chip";
+
+      const displayValue =
+        item.drawsAgo === null && sortKey === "drawsAgo"
+          ? "never"
+          : item.count ?? item.drawsAgo;
+
+      const rank = index + 1;
+      chip.innerHTML =
+        `<span class="rank-label">#${rank}</span>` +
+        `<strong>${item.number}</strong> · ${displayValue} ${suffix}`;
+
+      chipList.appendChild(chip);
+    });
+  }
+
+  // Initial render
+  renderChips(currentDirection);
+
+  // Sort button handlers
+  btnAsc.addEventListener("click", () => {
+    if (currentDirection === "asc") return;
+    currentDirection = "asc";
+    btnAsc.classList.add("active");
+    btnDesc.classList.remove("active");
+    renderChips("asc");
+  });
+
+  btnDesc.addEventListener("click", () => {
+    if (currentDirection === "desc") return;
+    currentDirection = "desc";
+    btnDesc.classList.add("active");
+    btnAsc.classList.remove("active");
+    renderChips("desc");
+  });
+
   return card;
+}
+
+/**
+ * Extracts a numeric sort value from an item.
+ * For overdue items, null drawsAgo → Infinity (most overdue).
+ */
+function getSortValue(item, sortKey) {
+  if (sortKey === "drawsAgo") {
+    return item.drawsAgo === null ? Infinity : item.drawsAgo;
+  }
+
+  return item.count ?? 0;
 }
 
 function createPatternCard(summary, config) {

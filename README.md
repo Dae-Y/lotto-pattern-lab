@@ -29,7 +29,7 @@ Because this project uses JavaScript ES modules, you must run it with a local we
 Using Python:
 
 ```bash
-python -m http.server 5500
+python3 -m http.server 5500
 ```
 
 Then open your browser and navigate to: `http://localhost:5500`

@@ -9,6 +9,7 @@ import { parseLotteryCsv } from "./parsers/lotteryParser.js";
 import { renderTabs } from "./renderers/tabsRenderer.js";
 import { renderRecentGrid } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
+import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
 const state = {
@@ -23,9 +24,10 @@ const elements = {
   loadSampleBtn: document.querySelector("#loadSampleBtn"),
   clearBtn: document.querySelector("#clearBtn"),
   status: document.querySelector("#status"),
-  summary: document.querySelector("#summary"),
+  compactMeta: document.querySelector("#compactMeta"),
   recentGrid: document.querySelector("#recentGrid"),
   stats: document.querySelector("#stats"),
+  generator: document.querySelector("#generator"),
 };
 
 init();
@@ -51,9 +53,10 @@ function renderAll() {
   const draws = state.drawsByGameId[state.activeGameId] ?? [];
 
   renderTabs(elements.tabs, GAME_CONFIGS, state.activeGameId, handleTabChange);
-  renderSummary(elements.summary, draws, config);
+  renderCompactMeta(elements.compactMeta, draws, config);
   renderRecentGrid(elements.recentGrid, draws, config, 10);
   renderStats(elements.stats, draws, config);
+  renderGenerator(elements.generator, config);
 }
 
 function handleTabChange(gameId) {
@@ -147,43 +150,28 @@ function clearActiveGameData() {
   renderAll();
 }
 
-function renderSummary(container, draws, config) {
-  container.innerHTML = "";
-
+function renderCompactMeta(container, draws, config) {
   if (!draws || draws.length === 0) {
-    container.appendChild(createSummaryCard("Game", config.name));
-    container.appendChild(createSummaryCard("Draws loaded", "0"));
-    container.appendChild(createSummaryCard("Latest draw", "-"));
-    container.appendChild(createSummaryCard("Source", "-"));
+    container.innerHTML = `
+      <div class="meta-main">No data loaded</div>
+      <div class="meta-source">Load a CSV file to begin.</div>
+    `;
     return;
   }
 
   const latestDraw = draws[0];
   const source = state.sourceByGameId[config.id] ?? "-";
 
-  container.appendChild(createSummaryCard("Game", config.name));
-  container.appendChild(
-    createSummaryCard("Draws loaded", draws.length.toLocaleString()),
-  );
-  container.appendChild(
-    createSummaryCard(
-      "Latest draw",
-      `#${latestDraw.drawNumber} · ${formatDateLong(latestDraw.drawDate)}`,
-    ),
-  );
-  container.appendChild(createSummaryCard("Source", source));
-}
-
-function createSummaryCard(label, value) {
-  const card = document.createElement("article");
-  card.className = "summary-card";
-
-  card.innerHTML = `
-    <div class="label">${label}</div>
-    <div class="value">${value}</div>
+  container.innerHTML = `
+    <div class="meta-main">
+      <strong>${draws.length.toLocaleString()}</strong> draws ·
+      Latest <strong>#${latestDraw.drawNumber}</strong> ·
+      ${formatDateLong(latestDraw.drawDate)}
+    </div>
+    <div class="meta-source">
+      Source: ${source}
+    </div>
   `;
-
-  return card;
 }
 
 function setStatus(message, isError = false) {

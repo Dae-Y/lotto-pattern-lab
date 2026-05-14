@@ -21,7 +21,10 @@
 
   <main class="app-shell">
     <section class="panel">
-      <div class="tabs" id="tabs"></div>
+      <div class="top-panel-header">
+        <div class="tabs" id="tabs"></div>
+        <div class="compact-meta" id="compactMeta"></div>
+      </div>
 
       <div class="controls">
         <button id="loadSampleBtn" class="primary-btn">
@@ -43,9 +46,7 @@
       </p>
     </section>
 
-    <section class="summary-grid" id="summary"></section>
-
-    <section class="panel">
+    <section class="panel wide-panel">
       <div class="section-heading">
         <div>
           <p class="eyebrow">Recent results</p>
@@ -66,12 +67,31 @@
 
       <div id="stats"></div>
     </section>
+
+    <section class="panel" id="generatorPanel">
+      <div id="generator"></div>
+    </section>
   </main>
 
   <footer class="app-footer">
-    <p>
-      This project is for data visualisation and pattern exploration only. It does not guarantee lottery results.
-    </p>
+    <div class="disclaimer-card">
+      <div class="disclaimer-header">
+        <span class="disclaimer-icon">※</span>
+        <h2>Disclaimer</h2>
+      </div>
+
+      <div class="disclaimer-body">
+        <p>Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
+        <p>This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
+        <p>Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
+        <p>Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
+        <p>Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
+      </div>
+
+      <div class="copyright">
+        © 2026 Daehwan Yeo. All rights reserved.
+      </div>
+    </div>
   </footer>
 
   <script type="module" src="./js/main.js"></script>
