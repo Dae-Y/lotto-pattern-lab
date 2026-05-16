@@ -24,7 +24,7 @@ export function parseCsv(csvText) {
   });
 }
 
-function parseCsvLine(line) {
+export function parseCsvLine(line) {
   const result = [];
   let current = "";
   let insideQuotes = false;

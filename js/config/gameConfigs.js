@@ -90,5 +90,47 @@ export function detectGameIdFromFileName(fileName) {
     }
   }
 
+  // Keyword-based fallback
+  if (lower.includes("oz")) return "5130";
+  if (lower.includes("powerball")) return "5132";
+  if (lower.includes("setforlife") || lower.includes("set for life") || lower.includes("set_for_life")) return "5237";
+
+  return null;
+}
+
+/**
+ * Detect game ID by inspecting CSV header columns.
+ * Uses parseCsvLine from csvParser.js for safe header parsing.
+ *
+ * Rules:
+ *   - "Powerball Number" present => Powerball (5132)
+ *   - "Supplementary Number 3" present => OZ Lotto (5130)
+ *   - "Supplementary Number 1" and "Supplementary Number 2" present,
+ *     but NOT "Supplementary Number 3" => Set for Life (5237)
+ *   - Otherwise => null (unknown)
+ */
+export function detectGameIdFromCsvText(csvText, parseCsvLine) {
+  if (!csvText) return null;
+
+  const firstNewline = csvText.indexOf("\n");
+  const headerLine = (firstNewline === -1 ? csvText : csvText.slice(0, firstNewline)).replace(/^\uFEFF/, "").trim();
+
+  if (!headerLine) return null;
+
+  const headers = parseCsvLine(headerLine).map((h) => h.trim());
+  const headerSet = new Set(headers);
+
+  if (headerSet.has("Powerball Number")) {
+    return "5132";
+  }
+
+  if (headerSet.has("Supplementary Number 3")) {
+    return "5130";
+  }
+
+  if (headerSet.has("Supplementary Number 1") && headerSet.has("Supplementary Number 2") && !headerSet.has("Supplementary Number 3")) {
+    return "5237";
+  }
+
   return null;
 }

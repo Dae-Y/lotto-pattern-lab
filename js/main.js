@@ -1,9 +1,12 @@
 import {
   DEFAULT_GAME_ID,
   GAME_CONFIGS,
+  detectGameIdFromCsvText,
   detectGameIdFromFileName,
   getGameConfig,
 } from "./config/gameConfigs.js";
+
+import { parseCsvLine } from "./parsers/csvParser.js";
 
 import { parseLotteryCsv } from "./parsers/lotteryParser.js";
 import { renderTabs } from "./renderers/tabsRenderer.js";
@@ -114,21 +117,22 @@ function handleTabChange(gameId) {
 async function loadSampleCsvForActiveGame() {
   const config = getGameConfig(state.activeGameId);
   const path = `./data/${config.fileName}`;
+  const sourceLabel = "Lotterywest public results data";
 
-  setStatus(`Loading ${config.fileName}...`);
+  setStatus(`Loading ${config.name} data...`);
 
   try {
     const response = await fetch(path);
 
     if (!response.ok) {
-      throw new Error(`Could not load ${path}`);
+      throw new Error(`Could not load ${config.name} data.`);
     }
 
     const csvText = await response.text();
-    loadCsvText(csvText, config, `data/${config.fileName}`);
+    loadCsvText(csvText, config, sourceLabel);
   } catch (error) {
     setStatus(
-      `Could not load ${config.fileName}. Upload the CSV manually or run the project with a local server.`,
+      `Could not load ${config.name} data. Upload the CSV manually or run the project with a local server.`,
       true,
     );
   }
@@ -141,17 +145,34 @@ function handleCsvUpload(event) {
     return;
   }
 
-  const detectedGameId = detectGameIdFromFileName(file.name);
-
-  if (detectedGameId && detectedGameId !== state.activeGameId) {
-    state.activeGameId = detectedGameId;
-  }
-
-  const config = getGameConfig(state.activeGameId);
+  const sourceLabel = "Uploaded CSV";
   const reader = new FileReader();
 
   reader.onload = () => {
-    loadCsvText(String(reader.result), config, file.name);
+    const csvText = String(reader.result);
+
+    // Detect game type from CSV headers first, fall back to file name
+    let detectedGameId = detectGameIdFromCsvText(csvText, parseCsvLine);
+
+    if (!detectedGameId) {
+      detectedGameId = detectGameIdFromFileName(file.name);
+    }
+
+    if (!detectedGameId) {
+      setStatus(
+        "Could not detect the lottery game from this CSV. Please use an official Lotterywest-style CSV with Winning Number and Powerball/Supplementary columns.",
+        true,
+      );
+      elements.csvInput.value = "";
+      return;
+    }
+
+    if (detectedGameId !== state.activeGameId) {
+      state.activeGameId = detectedGameId;
+    }
+
+    const config = getGameConfig(state.activeGameId);
+    loadCsvText(csvText, config, sourceLabel);
     elements.csvInput.value = "";
   };
 
@@ -162,7 +183,7 @@ function handleCsvUpload(event) {
   reader.readAsText(file);
 }
 
-function loadCsvText(csvText, config, sourceName) {
+function loadCsvText(csvText, config, sourceLabel) {
   try {
     const draws = parseLotteryCsv(csvText, config);
 
@@ -171,10 +192,10 @@ function loadCsvText(csvText, config, sourceName) {
     }
 
     state.drawsByGameId[config.id] = draws;
-    state.sourceByGameId[config.id] = sourceName;
+    state.sourceByGameId[config.id] = sourceLabel;
 
     setStatus(
-      `${config.name}: loaded ${draws.length.toLocaleString()} current-format draws from ${sourceName}.`,
+      `${config.name}: loaded ${draws.length.toLocaleString()} current-format draws from ${sourceLabel.toLowerCase()}.`,
     );
 
     renderAll();

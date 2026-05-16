@@ -89,9 +89,35 @@
   color: var(--primary-dark);
 }
 
-.pattern-list {
+.pattern-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.pattern-section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+  padding: 10px 12px;
+}
+
+.pattern-section h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.pattern-section ul {
   margin: 0;
   padding-left: 18px;
   color: var(--text);
   line-height: 1.7;
+}
+
+.pattern-section li {
+  color: var(--muted);
+}
+
+.pattern-section strong {
+  color: var(--text);
 }

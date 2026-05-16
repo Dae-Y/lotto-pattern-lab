@@ -168,19 +168,103 @@ function createPatternCard(summary, config) {
   const card = document.createElement("article");
   card.className = "stat-card";
 
-  card.innerHTML = `
-    <h3>Pattern summary</h3>
-    <ul class="pattern-list">
-      <li>Total draws used: <strong>${summary.totalDraws}</strong></li>
-      <li>Average sum: <strong>${summary.averageSum}</strong></li>
-      <li>Lowest sum: <strong>${summary.minSum}</strong></li>
-      <li>Highest sum: <strong>${summary.maxSum}</strong></li>
-      <li>Most common odd/even: <strong>${summary.mostCommonOddEven}</strong></li>
-      <li>Latest draw odd/even: <strong>${summary.latestOddEven}</strong></li>
-      <li>Latest draw sum: <strong>${summary.latestSum}</strong></li>
-      <li>Main range: <strong>1-${config.main.range}</strong></li>
-    </ul>
-  `;
+  const heading = document.createElement("h3");
+  heading.textContent = "Pattern summary";
+  card.appendChild(heading);
 
+  const na = "N/A";
+  const s = summary;
+
+  const repeatLatest = s.hasRepeatData ? s.latestRepeatFromPrevious : na;
+  const repeatAvg = s.hasRepeatData ? s.averageRepeatFromPrevious : na;
+  const repeatMost = s.hasRepeatData ? s.mostCommonRepeatCount : na;
+  const repeatMax = s.hasRepeatData ? s.maxRepeatObserved : na;
+
+  const sections = [
+    {
+      title: "Dataset",
+      items: [
+        ["Total draws used", s.totalDraws],
+        ["Main range", `1\u2013${s.mainRange}`],
+      ],
+    },
+    {
+      title: "Sum",
+      items: [
+        ["Average sum", s.averageSum],
+        ["Latest sum", s.latestSum],
+        ["Lowest sum", s.minSum],
+        ["Highest sum", s.maxSum],
+      ],
+    },
+    {
+      title: "Odd / Even",
+      items: [
+        ["Most common odd/even", s.mostCommonOddEven],
+        ["Latest odd/even", s.latestOddEven],
+      ],
+    },
+    {
+      title: "Spread",
+      items: [
+        ["Average spread", s.averageSpread],
+        ["Latest spread", s.latestSpread],
+        ["Lowest spread", s.minSpread],
+        ["Highest spread", s.maxSpread],
+      ],
+    },
+    {
+      title: "Repeat from previous draw",
+      items: [
+        ["Latest repeat", repeatLatest],
+        ["Average repeat", repeatAvg],
+        ["Most common repeat", repeatMost],
+        ["Max repeat observed", repeatMax],
+      ],
+    },
+    {
+      title: "Consecutive numbers",
+      items: [
+        ["Latest consecutive pairs", s.latestConsecutivePairs],
+        ["Average consecutive pairs", s.averageConsecutivePairs],
+        ["Draws with consecutive numbers", `${s.percentageOfDrawsWithConsecutiveNumbers}%`],
+        ["Most common consecutive pair count", s.mostCommonConsecutivePairCount],
+      ],
+    },
+    {
+      title: "Observed vs expected random",
+      items: [
+        ["Average sum", `${s.averageSum} vs ${s.expected.expectedSum}`],
+        ["Average repeat", `${repeatAvg} vs ${s.expected.expectedRepeat}`],
+        ["Average spread", `${s.averageSpread} vs ${s.expected.expectedSpread}`],
+        ["Average consecutive pairs", `${s.averageConsecutivePairs} vs ${s.expected.expectedConsecutivePairs}`],
+      ],
+    },
+  ];
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "pattern-summary";
+
+  for (const section of sections) {
+    const div = document.createElement("div");
+    div.className = "pattern-section";
+
+    const h4 = document.createElement("h4");
+    h4.textContent = section.title;
+    div.appendChild(h4);
+
+    const ul = document.createElement("ul");
+
+    for (const [label, value] of section.items) {
+      const li = document.createElement("li");
+      li.innerHTML = `${label}: <strong>${value}</strong>`;
+      ul.appendChild(li);
+    }
+
+    div.appendChild(ul);
+    wrapper.appendChild(div);
+  }
+
+  card.appendChild(wrapper);
   return card;
 }
