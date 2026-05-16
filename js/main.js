@@ -12,6 +12,7 @@ import { parseLotteryCsv } from "./parsers/lotteryParser.js";
 import { renderTabs } from "./renderers/tabsRenderer.js";
 import { renderRecentResults } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
+import { renderPatternInsights } from "./renderers/patternInsightsRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
@@ -35,6 +36,7 @@ const elements = {
   tableViewBtn: document.querySelector("#tableViewBtn"),
   compactViewBtn: document.querySelector("#compactViewBtn"),
   stats: document.querySelector("#stats"),
+  patternInsights: document.querySelector("#patternInsights"),
   generator: document.querySelector("#generator"),
 };
 
@@ -102,6 +104,21 @@ function renderAll() {
     viewMode: state.recentViewMode,
   });
   renderStats(elements.stats, draws, config);
+
+  try {
+    renderPatternInsights(elements.patternInsights, draws, config);
+  } catch (error) {
+    console.error("Pattern Insights failed:", error);
+  
+    if (elements.patternInsights) {
+      elements.patternInsights.innerHTML = `
+        <div class="empty-state">
+          Pattern Insights could not be rendered.
+        </div>
+      `;
+    }
+  }
+
   renderGenerator(elements.generator, config);
 }
 

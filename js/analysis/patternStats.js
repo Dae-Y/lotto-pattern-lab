@@ -3,49 +3,44 @@ import {
   countOddEven,
   countConsecutivePairs,
   countRepeatsFromPrevious,
-  spread,
+  getSpread,
   sum,
+  getMode,
+  formatNumber,
+  formatPercent,
 } from "../utils/numberUtils.js";
 
-import { getExpectedRandom } from "./randomBaseline.js";
+import { getRandomBaseline } from "./randomBaseline.js";
 
 export function getPatternSummary(draws, config) {
   const latestDraw = draws[0];
 
   // ── Sum ──
   const mainSums = draws.map((draw) => sum(draw.mainNumbers));
+  const avgSum = average(mainSums);
 
   // ── Odd / Even ──
-  const oddEvenCounts = new Map();
-
-  draws.forEach((draw) => {
+  const oddEvenStrings = draws.map((draw) => {
     const { odd, even } = countOddEven(draw.mainNumbers);
-    const key = `${odd} odd / ${even} even`;
-    oddEvenCounts.set(key, (oddEvenCounts.get(key) ?? 0) + 1);
+    return `${odd} odd / ${even} even`;
   });
 
-  const mostCommonOddEven = Array.from(oddEvenCounts.entries())
-    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? "N/A";
-
+  const mostCommonOddEven = getMode(oddEvenStrings) ?? "N/A";
   const latestOddEvenCount = countOddEven(latestDraw.mainNumbers);
 
   // ── Spread ──
-  const spreads = draws.map((draw) => spread(draw.mainNumbers));
+  const spreads = draws.map((draw) => getSpread(draw.mainNumbers));
+  const avgSpread = average(spreads);
 
   // ── Consecutive pairs ──
   const consecutiveCounts = draws.map((draw) =>
     countConsecutivePairs(draw.mainNumbers),
   );
+  const avgConsecutive = average(consecutiveCounts);
 
-  const consecutiveFreqs = new Map();
-  consecutiveCounts.forEach((c) => {
-    consecutiveFreqs.set(c, (consecutiveFreqs.get(c) ?? 0) + 1);
-  });
-
-  const mostCommonConsecutivePairCount = Array.from(consecutiveFreqs.entries())
-    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? 0;
-
+  const mostCommonConsecutivePairCount = getMode(consecutiveCounts) ?? 0;
   const drawsWithConsecutive = consecutiveCounts.filter((c) => c > 0).length;
+  const percentConsecutive = draws.length > 0 ? drawsWithConsecutive / draws.length : 0;
 
   // ── Repeat from previous draw ──
   const hasRepeatData = draws.length >= 2;
@@ -62,17 +57,11 @@ export function getPatternSummary(draws, config) {
     }
   }
 
-  const repeatFreqs = new Map();
-  repeatCounts.forEach((c) => {
-    repeatFreqs.set(c, (repeatFreqs.get(c) ?? 0) + 1);
-  });
-
-  const mostCommonRepeatCount = repeatCounts.length > 0
-    ? Array.from(repeatFreqs.entries()).sort((a, b) => b[1] - a[1])[0][0]
-    : null;
+  const avgRepeat = hasRepeatData ? average(repeatCounts) : null;
+  const mostCommonRepeatCount = hasRepeatData ? (getMode(repeatCounts) ?? 0) : null;
 
   // ── Random baseline ──
-  const expected = getExpectedRandom(config);
+  const expected = getRandomBaseline(config);
 
   return {
     // Dataset
@@ -80,7 +69,7 @@ export function getPatternSummary(draws, config) {
     mainRange: config.main.range,
 
     // Sum
-    averageSum: round2(average(mainSums)),
+    averageSum: formatNumber(avgSum, 2),
     latestSum: sum(latestDraw.mainNumbers),
     minSum: Math.min(...mainSums),
     maxSum: Math.max(...mainSums),
@@ -90,31 +79,32 @@ export function getPatternSummary(draws, config) {
     latestOddEven: `${latestOddEvenCount.odd} odd / ${latestOddEvenCount.even} even`,
 
     // Spread
-    averageSpread: round2(average(spreads)),
-    latestSpread: spread(latestDraw.mainNumbers),
+    averageSpread: formatNumber(avgSpread, 2),
+    latestSpread: getSpread(latestDraw.mainNumbers),
     minSpread: Math.min(...spreads),
     maxSpread: Math.max(...spreads),
 
     // Repeat from previous draw
-    hasRepeatData,
     latestRepeatFromPrevious: hasRepeatData ? repeatCounts[0] : null,
-    averageRepeatFromPrevious: hasRepeatData ? round2(average(repeatCounts)) : null,
+    averageRepeatFromPrevious: hasRepeatData ? formatNumber(avgRepeat, 2) : null,
     mostCommonRepeatCount,
     maxRepeatObserved: hasRepeatData ? Math.max(...repeatCounts) : null,
 
     // Consecutive numbers
     latestConsecutivePairs: consecutiveCounts[0],
-    averageConsecutivePairs: round2(average(consecutiveCounts)),
-    percentageOfDrawsWithConsecutiveNumbers: round2(
-      (drawsWithConsecutive / draws.length) * 100,
-    ),
+    averageConsecutivePairs: formatNumber(avgConsecutive, 2),
+    percentageOfDrawsWithConsecutiveNumbers: formatPercent(percentConsecutive),
     mostCommonConsecutivePairCount,
 
-    // Random baseline
-    expected,
-  };
-}
+    // Observed vs expected random
+    expectedAverageSum: formatNumber(expected.expectedAverageSum, 2),
+    expectedRepeatFromPrevious: formatNumber(expected.expectedRepeatFromPrevious, 2),
+    expectedSpread: formatNumber(expected.expectedSpread, 2),
+    expectedConsecutivePairs: formatNumber(expected.expectedConsecutivePairs, 2),
 
-function round2(value) {
-  return Math.round(value * 100) / 100;
+    observedAverageSum: formatNumber(avgSum, 2),
+    observedAverageRepeat: formatNumber(avgRepeat, 2),
+    observedAverageSpread: formatNumber(avgSpread, 2),
+    observedAverageConsecutivePairs: formatNumber(avgConsecutive, 2),
+  };
 }

@@ -32,7 +32,8 @@ export function countOddEven(numbers) {
 /**
  * Returns the spread (max − min) of a number array.
  */
-export function spread(numbers) {
+export function getSpread(numbers) {
+  if (!numbers || numbers.length === 0) return 0;
   return Math.max(...numbers) - Math.min(...numbers);
 }
 
@@ -51,6 +52,35 @@ export function countConsecutivePairs(numbers) {
   }
 
   return pairs;
+}
+
+export function formatNumber(value, digits = 2) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return "N/A";
+  }
+
+  return Number(Number(value).toFixed(digits)).toString();
+}
+
+export function formatPercent(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return "N/A";
+  }
+
+  return `${Math.round(Number(value) * 100)}%`;
+}
+
+export function getMode(values) {
+  if (!values || values.length === 0) return null;
+
+  const counts = new Map();
+
+  values.forEach((value) => {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  });
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0] - b[0])[0][0];
 }
 
 /**
