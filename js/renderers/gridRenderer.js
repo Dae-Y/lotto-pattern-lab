@@ -8,7 +8,7 @@ import { range } from "../utils/numberUtils.js";
  * @param {Object} config
  * @param {Object} options - { limit: number, viewMode: "table"|"compact" }
  */
-export function renderRecentResults(container, draws, config, options = {}) {
+export function renderRecentResults(container, draws, config, options = {}, copy) {
   const { limit = 10, viewMode = "table" } = options;
 
   container.innerHTML = "";
@@ -38,9 +38,9 @@ export function renderRecentResults(container, draws, config, options = {}) {
   scrollArea.className = "recent-scroll-area";
 
   if (viewMode === "compact") {
-    scrollArea.appendChild(renderCompactView(recentDraws, config));
+    scrollArea.appendChild(renderCompactView(recentDraws, config, copy));
   } else {
-    const legend = createLegend(config);
+    const legend = createLegend(config, copy);
     container.appendChild(legend);
 
     const wrapper = document.createElement("div");
@@ -48,8 +48,8 @@ export function renderRecentResults(container, draws, config, options = {}) {
 
     const table = document.createElement("table");
     table.className = "result-table";
-    table.appendChild(createTableHead(config));
-    table.appendChild(createTableBody(recentDraws, config));
+    table.appendChild(createTableHead(config, copy));
+    table.appendChild(createTableBody(recentDraws, config, copy));
 
     wrapper.appendChild(table);
     scrollArea.appendChild(wrapper);
@@ -60,7 +60,7 @@ export function renderRecentResults(container, draws, config, options = {}) {
 
 /* ── Compact View ── */
 
-function renderCompactView(draws, config) {
+function renderCompactView(draws, config, copy) {
   const list = document.createElement("div");
   list.className = "compact-results";
 
@@ -77,7 +77,7 @@ function renderCompactView(draws, config) {
     meta.className = "compact-draw-meta";
     meta.innerHTML = `
       <div class="compact-draw-number">#${draw.drawNumber}</div>
-      <div class="compact-draw-date">${formatDateShort(draw.drawDate)}</div>
+      <div class="compact-draw-date">${formatDateShort(draw.drawDate, copy?.locale ?? config.locale ?? "en-AU")}</div>
     `;
 
     // Ball row
@@ -114,7 +114,7 @@ function renderCompactView(draws, config) {
 
 /* ── Table View Helpers ── */
 
-function createLegend(config) {
+function createLegend(config, copy) {
   const legend = document.createElement("div");
   legend.className = "legend";
 
@@ -122,14 +122,14 @@ function createLegend(config) {
   mainItem.className = "legend-item";
   mainItem.innerHTML = `
     <span class="legend-box main-hit"></span>
-    ${config.display.mainMark} = ${config.main.label}
+    ${copy ? copy.recent.legendMain : `${config.display.mainMark} = ${config.main.label}`}
   `;
 
   const secondaryItem = document.createElement("span");
   secondaryItem.className = "legend-item";
   secondaryItem.innerHTML = `
     <span class="legend-box ${config.display.secondaryClass}"></span>
-    ${config.display.secondaryMark} = ${config.secondary.label}
+    ${copy ? copy.recent.legendSecondary : `${config.display.secondaryMark} = ${config.secondary.label}`}
   `;
 
   legend.appendChild(mainItem);
@@ -138,15 +138,19 @@ function createLegend(config) {
   return legend;
 }
 
-function createTableHead(config) {
+function createTableHead(config, copy) {
   const thead = document.createElement("thead");
 
   const groupRow = document.createElement("tr");
-  groupRow.appendChild(createHeaderCell("Draw", "sticky-col", 2));
-  groupRow.appendChild(createHeaderCell("Date", "sticky-col second", 2));
+  const drawLabel = copy ? copy.recent.draw : "Draw";
+  const dateLabel = copy ? copy.recent.date : "Date";
+  
+  groupRow.appendChild(createHeaderCell(drawLabel, "sticky-col", 2));
+  groupRow.appendChild(createHeaderCell(dateLabel, "sticky-col second", 2));
 
+  const mainHeaderStr = copy && copy.recent.draw === "회차" ? `${config.main.label} 1\u2013${config.main.range}` : `${config.main.label} Numbers 1-${config.main.range}`;
   const mainHeader = createHeaderCell(
-    `${config.main.label} Numbers 1-${config.main.range}`,
+    mainHeaderStr,
     "",
     1,
   );
@@ -154,8 +158,9 @@ function createTableHead(config) {
   groupRow.appendChild(mainHeader);
 
   if (!config.secondary.sharesMainGrid) {
+    const secondaryHeaderStr = copy && copy.recent.draw === "회차" ? `${config.secondary.label} 1\u2013${config.secondary.range}` : `${config.secondary.label} 1-${config.secondary.range}`;
     const secondaryHeader = createHeaderCell(
-      `${config.secondary.label} 1-${config.secondary.range}`,
+      secondaryHeaderStr,
       "",
       1,
     );
@@ -181,7 +186,7 @@ function createTableHead(config) {
   return thead;
 }
 
-function createTableBody(draws, config) {
+function createTableBody(draws, config, copy) {
   const tbody = document.createElement("tbody");
 
   draws.forEach((draw) => {
@@ -194,7 +199,7 @@ function createTableBody(draws, config) {
 
     const dateCell = document.createElement("td");
     dateCell.className = "sticky-col second";
-    dateCell.textContent = formatDateShort(draw.drawDate);
+    dateCell.textContent = formatDateShort(draw.drawDate, copy?.locale ?? config.locale ?? "en-AU");
     row.appendChild(dateCell);
 
     range(1, config.main.range).forEach((number) => {

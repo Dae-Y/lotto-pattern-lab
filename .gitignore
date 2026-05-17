@@ -8,7 +8,7 @@ __pycache__/
 *$py.class
 
 # Node dependencies
-# The current project does not require npm packages, but ignore this in case it is added later.
+# The browser app does not require npm packages, but ignore this in case tooling is added later.
 node_modules/
 
 # Environment variables / local secrets
@@ -42,10 +42,8 @@ temp/
 .vscode/
 .idea/
 
-# Keep lottery data files tracked.
-# Do NOT ignore data/*.csv or data/*.json because GitHub Pages needs them.
-
 # Debug HTML files generated when Donghaeng Lottery blocks scripted requests
 data/debug-dhlottery-*.html
 
-
+# Keep lottery data files tracked.
+# Do NOT ignore data/*.csv or data/*.json because GitHub Pages needs them.

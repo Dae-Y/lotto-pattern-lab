@@ -1,20 +1,14 @@
 import { getPatternSummary } from "../analysis/patternStats.js";
-import { 
-  getOddEvenDistribution, 
-  getSumDistribution, 
-  getRepeatDistribution, 
-  getConsecutiveDistribution 
+import {
+  getOddEvenDistribution,
+  getSumDistribution,
+  getRepeatDistribution,
+  getConsecutiveDistribution
 } from "../analysis/patternDistributions.js";
 
-// Date formatting utility
-function formatDateLong(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-}
+import { formatDateLong } from "../utils/dateUtils.js";
 
-export function renderPatternInsights(container, draws, config) {
+export function renderPatternInsights(container, draws, config, copy) {
   container.innerHTML = "";
 
   if (!draws || draws.length === 0) {
@@ -27,25 +21,30 @@ export function renderPatternInsights(container, draws, config) {
   }
 
   const summary = getPatternSummary(draws, config);
+  const c = copy || { insights: {} }; // Fallback
+  const ins = c.insights;
 
   const header = document.createElement("div");
   header.className = "insights-header";
+
+  const isKorean = copy && copy.header && copy.header.title.includes("한국");
+
   header.innerHTML = `
     <div>
-      <p class="eyebrow">Deep analysis</p>
-      <h2>Pattern Insights</h2>
+      <p class="eyebrow" id="insightsEyebrow">${ins.eyebrow}</p>
+      <h2 id="insightsTitle">${ins.title}</h2>
       <p class="insights-description">
-        A closer look at distribution, repetition, spread, and random-baseline behaviour.
+        ${ins.subtitle}
       </p>
       <div class="insights-meta-row">
         <span class="insights-meta-pill">
-          <strong>${summary.totalDraws}</strong> draws
+          <strong>${summary.totalDraws}</strong> ${isKorean ? '회차' : 'draws'}
         </span>
         <span class="insights-meta-pill">
-          Main range <strong>1\u2013${summary.mainRange}</strong>
+          ${isKorean ? '당첨번호 범위' : 'Main range'} <strong>1\u2013${summary.mainRange}</strong>
         </span>
         <span class="insights-meta-pill">
-          <strong>${config.main.count}</strong> main numbers per draw
+          ${isKorean ? `회당 당첨번호 <strong>${config.main.count}</strong>개` : `<strong>${config.main.count}</strong> main numbers per draw`}
         </span>
       </div>
     </div>
@@ -58,55 +57,55 @@ export function renderPatternInsights(container, draws, config) {
 
   const cards = [
     {
-      title: "Sum",
+      title: ins.sumTitle,
       items: [
-        { label: "Average", value: summary.averageSum },
-        { label: "Latest", value: summary.latestSum },
-        { label: "Lowest", value: summary.minSum },
-        { label: "Highest", value: summary.maxSum }
+        { label: isKorean ? "평균" : "Average", value: summary.averageSum },
+        { label: isKorean ? "최근" : "Latest", value: summary.latestSum },
+        { label: isKorean ? "최소" : "Lowest", value: summary.minSum },
+        { label: isKorean ? "최대" : "Highest", value: summary.maxSum }
       ]
     },
     {
-      title: "Odd / Even",
+      title: ins.oddEvenTitle,
       items: [
-        { label: "Most common", value: summary.mostCommonOddEven },
-        { label: "Latest", value: summary.latestOddEven }
+        { label: isKorean ? "가장 흔한 비율" : "Most common", value: summary.mostCommonOddEven },
+        { label: isKorean ? "최근" : "Latest", value: summary.latestOddEven }
       ]
     },
     {
-      title: "Spread",
+      title: ins.spreadTitle,
       items: [
-        { label: "Average", value: summary.averageSpread },
-        { label: "Latest", value: summary.latestSpread },
-        { label: "Lowest", value: summary.minSpread },
-        { label: "Highest", value: summary.maxSpread }
+        { label: isKorean ? "평균" : "Average", value: summary.averageSpread },
+        { label: isKorean ? "최근" : "Latest", value: summary.latestSpread },
+        { label: isKorean ? "최소" : "Lowest", value: summary.minSpread },
+        { label: isKorean ? "최대" : "Highest", value: summary.maxSpread }
       ]
     },
     {
-      title: "Repeat from Previous Draw",
+      title: ins.repeatTitle,
       items: [
-        { label: "Latest repeat", value: summary.latestRepeatFromPrevious ?? "N/A" },
-        { label: "Average repeat", value: summary.averageRepeatFromPrevious ?? "N/A" },
-        { label: "Most common", value: summary.mostCommonRepeatCount ?? "N/A" },
-        { label: "Max observed", value: summary.maxRepeatObserved ?? "N/A" }
+        { label: isKorean ? "최근 반복 수" : "Latest repeat", value: summary.latestRepeatFromPrevious ?? "N/A" },
+        { label: isKorean ? "평균 반복 수" : "Average repeat", value: summary.averageRepeatFromPrevious ?? "N/A" },
+        { label: isKorean ? "가장 흔한 반복 수" : "Most common", value: summary.mostCommonRepeatCount ?? "N/A" },
+        { label: isKorean ? "최대 관측 수" : "Max observed", value: summary.maxRepeatObserved ?? "N/A" }
       ]
     },
     {
-      title: "Consecutive Numbers",
+      title: ins.consecutiveTitle,
       items: [
-        { label: "Latest pairs", value: summary.latestConsecutivePairs },
-        { label: "Average pairs", value: summary.averageConsecutivePairs },
-        { label: "Draws with consecutive numbers", value: summary.percentageOfDrawsWithConsecutiveNumbers },
-        { label: "Most common pair count", value: summary.mostCommonConsecutivePairCount }
+        { label: isKorean ? "최근 연속 쌍" : "Latest pairs", value: summary.latestConsecutivePairs },
+        { label: isKorean ? "평균 연속 쌍" : "Average pairs", value: summary.averageConsecutivePairs },
+        { label: isKorean ? "연속 번호 포함 회차 비중" : "Draws with consecutive numbers", value: summary.percentageOfDrawsWithConsecutiveNumbers },
+        { label: isKorean ? "가장 흔한 쌍 개수" : "Most common pair count", value: summary.mostCommonConsecutivePairCount }
       ]
     },
     {
-      title: "Observed vs Expected Random",
+      title: ins.expectedTitle,
       items: [
-        { label: "Average sum", value: `${summary.observedAverageSum} / ${summary.expectedAverageSum} expected` },
-        { label: "Average repeat", value: `${summary.observedAverageRepeat} / ${summary.expectedRepeatFromPrevious} expected` },
-        { label: "Average spread", value: `${summary.observedAverageSpread} / ${summary.expectedSpread} expected` },
-        { label: "Consecutive pairs", value: `${summary.observedAverageConsecutivePairs} / ${summary.expectedConsecutivePairs} expected` }
+        { label: isKorean ? "평균 합계" : "Average sum", value: `${summary.observedAverageSum} / ${isKorean ? '기대값' : 'expected'} ${summary.expectedAverageSum}` },
+        { label: isKorean ? "평균 반복" : "Average repeat", value: `${summary.observedAverageRepeat} / ${isKorean ? '기대값' : 'expected'} ${summary.expectedRepeatFromPrevious}` },
+        { label: isKorean ? "평균 범위" : "Average spread", value: `${summary.observedAverageSpread} / ${isKorean ? '기대값' : 'expected'} ${summary.expectedSpread}` },
+        { label: isKorean ? "연속 번호 쌍" : "Consecutive pairs", value: `${summary.observedAverageConsecutivePairs} / ${isKorean ? '기대값' : 'expected'} ${summary.expectedConsecutivePairs}` }
       ]
     }
   ];
@@ -114,14 +113,14 @@ export function renderPatternInsights(container, draws, config) {
   cards.forEach(cardData => {
     const card = document.createElement("div");
     card.className = "insight-card";
-    
+
     const h3 = document.createElement("h3");
     h3.textContent = cardData.title;
     card.appendChild(h3);
-    
+
     const list = document.createElement("div");
     list.className = "insight-metric-list";
-    
+
     cardData.items.forEach(item => {
       const metric = document.createElement("div");
       metric.className = "insight-metric";
@@ -131,29 +130,31 @@ export function renderPatternInsights(container, draws, config) {
       `;
       list.appendChild(metric);
     });
-    
+
     card.appendChild(list);
     cardGrid.appendChild(card);
   });
-  
+
   container.appendChild(cardGrid);
 
   // Render Chart Section Header
   const latestDraw = draws[0];
-  const formattedDate = formatDateLong(latestDraw.drawDate);
+  const locale = copy && copy.locale ? copy.locale : (config.locale || "en-AU");
+  const formattedDate = formatDateLong(latestDraw.drawDate, locale);
   const chartSectionHeader = document.createElement("div");
   chartSectionHeader.className = "insight-chart-section-header";
   chartSectionHeader.innerHTML = `
     <div>
-      <p class="eyebrow">Visual distribution</p>
+      <p class="eyebrow">${ins.visualEyebrow}</p>
       <div class="insight-chart-section-title-row">
-        <h3>Bar Charts</h3>
+        <h3>${ins.barCharts}</h3>
         <p class="insight-chart-section-description">
-          <span class="latest-badge">Latest</span>
-          <span>refers to latest draw</span>
+          <span class="latest-badge">${ins.latestBadgeText}</span>
+          <span>${ins.latestExplanationPrefix}</span>
           <strong>#${latestDraw.drawNumber}</strong>
           <span>&middot;</span>
           <strong>${formattedDate}</strong>
+          <span>${ins.latestExplanationSuffix}</span>
         </p>
       </div>
     </div>
@@ -171,53 +172,57 @@ export function renderPatternInsights(container, draws, config) {
 
   chartGrid.appendChild(
     createChartCard(
-      "Odd / Even Distribution",
-      "Shows how often each odd/even split appears.",
-      oddEvenDist
+      ins.oddEvenDistribution,
+      ins.oddEvenDistributionDescription,
+      oddEvenDist,
+      ins
     )
   );
-  
+
   chartGrid.appendChild(
     createChartCard(
-      "Sum Distribution",
-      "Groups draw sums into ranges.",
-      sumDist
+      ins.sumDistribution,
+      ins.sumDistributionDescription,
+      sumDist,
+      ins
     )
   );
-  
+
   if (draws.length < 2) {
     chartGrid.appendChild(
       createEmptyChartCard(
-        "Repeat From Previous Draw Distribution",
-        "Shows how many numbers usually repeat from the previous draw.",
-        "Not enough draws to calculate repeat distribution."
+        ins.repeatDistribution,
+        ins.repeatDistributionDescription,
+        isKorean ? "반복 분포를 계산하기 위한 회차 데이터가 부족합니다." : "Not enough draws to calculate repeat distribution."
       )
     );
   } else {
     chartGrid.appendChild(
       createChartCard(
-        "Repeat From Previous Draw Distribution",
-        "Shows how many numbers usually repeat from the previous draw.",
-        repeatDist
+        ins.repeatDistribution,
+        ins.repeatDistributionDescription,
+        repeatDist,
+        ins
       )
     );
   }
-  
+
   chartGrid.appendChild(
     createChartCard(
-      "Consecutive Pair Distribution",
-      "Shows how often draws contain adjacent number pairs.",
-      consecutiveDist
+      ins.consecutiveDistribution,
+      ins.consecutiveDistributionDescription,
+      consecutiveDist,
+      ins
     )
   );
 
   container.appendChild(chartGrid);
 }
 
-function createChartCard(title, description, items) {
+function createChartCard(title, description, items, ins) {
   const card = document.createElement("div");
   card.className = "insight-chart-card";
-  
+
   const h3 = document.createElement("h3");
   h3.textContent = title;
   card.appendChild(h3);
@@ -226,7 +231,7 @@ function createChartCard(title, description, items) {
   desc.className = "insight-chart-description";
   desc.textContent = description;
   card.appendChild(desc);
-  
+
   if (!items || items.length === 0) {
     const emptyState = document.createElement("div");
     emptyState.className = "empty-state";
@@ -237,14 +242,14 @@ function createChartCard(title, description, items) {
     return card;
   }
 
-  card.appendChild(createMiniBarChart(items));
+  card.appendChild(createMiniBarChart(items, ins));
   return card;
 }
 
 function createEmptyChartCard(title, description, message) {
   const card = document.createElement("div");
   card.className = "insight-chart-card";
-  
+
   const h3 = document.createElement("h3");
   h3.textContent = title;
   card.appendChild(h3);
@@ -253,18 +258,18 @@ function createEmptyChartCard(title, description, message) {
   desc.className = "insight-chart-description";
   desc.textContent = description;
   card.appendChild(desc);
-  
+
   const emptyState = document.createElement("div");
   emptyState.className = "empty-state";
   emptyState.style.padding = "20px 0";
   emptyState.style.fontSize = "13px";
   emptyState.textContent = message;
   card.appendChild(emptyState);
-  
+
   return card;
 }
 
-function createMiniBarChart(items) {
+function createMiniBarChart(items, ins) {
   const maxCount = Math.max(...items.map((item) => item.count), 1);
 
   const chart = document.createElement("div");
@@ -279,7 +284,7 @@ function createMiniBarChart(items) {
     row.innerHTML = `
       <div class="mini-bar-label">
         ${item.label}
-        ${item.isLatest ? '<span class="latest-badge">Latest</span>' : ""}
+        ${item.isLatest ? `<span class="latest-badge">${ins.latestBadgeText}</span>` : ""}
       </div>
       <div class="mini-bar-track">
         <div class="mini-bar-fill" style="width: ${percent}%"></div>

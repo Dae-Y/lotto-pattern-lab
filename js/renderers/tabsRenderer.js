@@ -1,7 +1,7 @@
 export function renderTabs(container, gameConfigs, activeGameId, onTabChange) {
   container.innerHTML = "";
 
-  Object.values(gameConfigs).forEach((config) => {
+  gameConfigs.forEach((config) => {
     const button = document.createElement("button");
 
     button.type = "button";

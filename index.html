@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
 
   <title>Lotto Pattern Lab</title>
 
@@ -40,7 +41,7 @@
     </div>
   </header>
 
-  <div id="australiaApp" style="display: block;">
+
     <main class="app-shell">
       <section class="panel">
         <div class="top-panel-header">
@@ -54,7 +55,7 @@
           </button>
 
           <label class="file-label">
-            Upload CSV
+            <span id="uploadCsvText">Upload CSV</span>
             <input id="csvInput" type="file" accept=".csv,text/csv" />
           </label>
 
@@ -71,13 +72,13 @@
       <section class="panel wide-panel">
         <div class="section-heading recent-heading">
           <div>
-            <p class="eyebrow">Recent results</p>
-            <h2>Recent Draws</h2>
+            <p class="eyebrow" id="recentEyebrow">Recent results</p>
+            <h2 id="recentTitle">Recent Draws</h2>
           </div>
 
           <div class="recent-controls">
             <label class="recent-count-label">
-              Draw count
+              <span id="recentCountText">Draw count</span>
               <input id="recentDrawCount" type="number" min="1" step="1" value="10" />
             </label>
 
@@ -98,8 +99,8 @@
       <section class="panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Quick analysis</p>
-            <h2>Quick Analysis</h2>
+            <p class="eyebrow" id="quickAnalysisEyebrow">Quick analysis</p>
+            <h2 id="quickAnalysisTitle">Quick Analysis</h2>
           </div>
         </div>
 
@@ -115,19 +116,19 @@
       </section>
     </main>
 
-    <footer class="app-footer">
+    <footer class="app-footer" id="appFooter">
       <div class="disclaimer-card">
         <div class="disclaimer-header">
           <span class="disclaimer-icon">※</span>
-          <h2>Disclaimer</h2>
+          <h2 id="disclaimerTitle">Disclaimer</h2>
         </div>
 
         <div class="disclaimer-body">
-          <p>Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
-          <p>This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
-          <p>Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
-          <p>Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
-          <p>Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
+          <p id="disclaimer1">Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
+          <p id="disclaimer2">This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
+          <p id="disclaimer3">Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
+          <p id="disclaimer4">Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
+          <p id="disclaimer5">Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
         </div>
 
         <div class="copyright">
@@ -135,28 +136,7 @@
         </div>
       </div>
     </footer>
-  </div>
 
-  <div id="koreaPlaceholder" style="display: none;">
-    <main class="app-shell">
-      <section class="panel" style="text-align: center; padding: 60px 20px;">
-        <p class="eyebrow" style="color: var(--primary);">한국 복권 지원</p>
-        <h2 style="margin: 8px 0;">로또 6/45</h2>
-        <p style="margin: 16px 0 8px; color: var(--text);">한국 로또 6/45 분석 기능은 현재 제작 중입니다.</p>
-        <p style="margin: 0 0 24px; color: var(--muted);">이 섹션은 동행복권 공식 로또 6/45 형식을 기준으로 구성될 예정입니다.</p>
-        
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: left; max-width: 440px; margin: 0 auto;">
-          <h3 style="margin: 0 0 12px; font-size: 15px;">추가 예정 기능</h3>
-          <ul style="margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; line-height: 1.6;">
-            <li>로또 6/45 회차별 결과 데이터 불러오기</li>
-            <li>최근 당첨번호 시각화</li>
-            <li>번호별 출현 빈도와 미출현 기간 분석</li>
-            <li>패턴 인사이트와 랜덤 번호 시뮬레이션</li>
-          </ul>
-        </div>
-      </section>
-    </main>
-  </div>
 
   <script type="module" src="./js/main.js"></script>
 </body>

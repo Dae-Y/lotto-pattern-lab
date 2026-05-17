@@ -1,7 +1,7 @@
 import { getTopFrequencies, getBottomFrequencies } from "../analysis/frequency.js";
 import { getOverdueNumbers } from "../analysis/overdue.js";
 
-export function renderStats(container, draws, config) {
+export function renderStats(container, draws, config, copy) {
   container.innerHTML = "";
 
   if (!draws || draws.length === 0) {
@@ -20,27 +20,29 @@ export function renderStats(container, draws, config) {
   const layout = document.createElement("div");
   layout.className = "stats-layout";
 
+  const c = copy || { quickAnalysis: { mostFrequentMain: "Most frequent winning numbers", leastFrequentMain: "Least frequent winning numbers", mostOverdueMain: "Most overdue winning numbers", mostFrequentSecondary: "Most frequent secondary numbers", mostOverdueSecondary: "Most overdue secondary numbers", times: "times", drawsAgo: "draws ago" } };
+
   layout.appendChild(
-    createSortableChipCard("Most frequent winning numbers", topMain, "times", "count"),
+    createSortableChipCard(c.quickAnalysis.mostFrequentMain, topMain, c.quickAnalysis.times, "count"),
   );
 
   layout.appendChild(
-    createSortableChipCard("Least frequent winning numbers", bottomMain, "times", "count"),
+    createSortableChipCard(c.quickAnalysis.leastFrequentMain, bottomMain, c.quickAnalysis.times, "count"),
   );
 
   layout.appendChild(
-    createSortableChipCard("Most overdue winning numbers", overdueMain, "draws ago", "drawsAgo"),
+    createSortableChipCard(c.quickAnalysis.mostOverdueMain, overdueMain, c.quickAnalysis.drawsAgo, "drawsAgo"),
   );
 
   const topSecondary = getTopFrequencies(draws, config, "secondary", 10);
   const overdueSecondary = getOverdueNumbers(draws, config, "secondary", 10);
 
   layout.appendChild(
-    createSortableChipCard(`Most frequent ${config.secondary.label}`, topSecondary, "times", "count"),
+    createSortableChipCard(c.quickAnalysis.mostFrequentSecondary, topSecondary, c.quickAnalysis.times, "count"),
   );
 
   layout.appendChild(
-    createSortableChipCard(`Most overdue ${config.secondary.label}`, overdueSecondary, "draws ago", "drawsAgo"),
+    createSortableChipCard(c.quickAnalysis.mostOverdueSecondary, overdueSecondary, c.quickAnalysis.drawsAgo, "drawsAgo"),
   );
 
   container.appendChild(layout);

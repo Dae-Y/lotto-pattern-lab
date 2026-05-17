@@ -1,7 +1,7 @@
 import { parseCsv } from "./csvParser.js";
 import { parseDrawDate } from "../utils/dateUtils.js";
 
-export function parseLotteryCsv(csvText, config) {
+export function parseLotterywestCsv(csvText, config) {
   const rows = parseCsv(csvText);
 
   const draws = rows

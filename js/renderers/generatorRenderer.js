@@ -1,7 +1,10 @@
 import { generateRandomEntries } from "../generator/randomGenerator.js";
 
-export function renderGenerator(container, config) {
+export function renderGenerator(container, config, copy) {
   container.innerHTML = "";
+
+  const c = copy || { generator: {} };
+  const gen = c.generator;
 
   // Header
   const header = document.createElement("div");
@@ -9,10 +12,10 @@ export function renderGenerator(container, config) {
 
   const headerText = document.createElement("div");
   headerText.innerHTML = `
-    <p class="eyebrow">Random picker</p>
-    <h2>Random Draw Simulator</h2>
+    <p class="eyebrow">${gen.eyebrow}</p>
+    <h2>${gen.title}</h2>
     <p class="generator-description">
-      Generate random draw results based on the selected game rule.
+      ${gen.description}
     </p>
   `;
 
@@ -34,10 +37,10 @@ export function renderGenerator(container, config) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "generator-btn";
-    button.textContent = `Generate ${count}`;
+    button.textContent = gen[`generate${count}`] || `Generate ${count}`;
 
     button.addEventListener("click", () => {
-      renderResults(resultList, config, count);
+      renderResults(resultList, config, count, copy);
       scrollArea.scrollTop = 0;
     });
 
@@ -50,18 +53,19 @@ export function renderGenerator(container, config) {
   // Note
   const note = document.createElement("p");
   note.className = "generator-note";
-  note.textContent =
-    "Generated numbers are random and are for entertainment/reference only. They do not improve the odds of winning.";
+  note.textContent = gen.note;
 
   container.appendChild(header);
   container.appendChild(scrollArea);
   container.appendChild(note);
 }
 
-function renderResults(resultList, config, count) {
+function renderResults(resultList, config, count, copy) {
   const entries = generateRandomEntries(config, count);
 
   resultList.innerHTML = "";
+  
+  const c = copy || { generator: { setLabel: "Set" } };
 
   entries.forEach((entry, index) => {
     const set = document.createElement("article");
@@ -69,7 +73,7 @@ function renderResults(resultList, config, count) {
 
     const label = document.createElement("div");
     label.className = "set-label";
-    label.textContent = `Set ${index + 1}`;
+    label.textContent = `${c.generator.setLabel} ${index + 1}`;
 
     const ballRow = document.createElement("div");
     ballRow.className = "ball-row";

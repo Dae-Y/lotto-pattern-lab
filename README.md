@@ -1,88 +1,244 @@
 # Lotto Pattern Lab
 
-A universal lottery data analyzer and pattern exploration tool. Designed to support multiple lottery formats through dynamic CSV parsing. Features historical trend visualization, statistical insights, and a sandbox for testing machine learning predictions.
+![Status](https://img.shields.io/badge/Status-Multi--country%20MVP-green.svg)
+![Built with](https://img.shields.io/badge/Built%20with-Vanilla%20JavaScript-yellow.svg)
+![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-blue.svg)
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933.svg)
+![License](https://img.shields.io/badge/License-MIT-orange.svg)
 
-## Supported CSV Files
+**Lotto Pattern Lab** is a personal lottery data visualisation and pattern exploration web app.
 
-Currently configured to support Western Australian Lotterywest formats:
+It currently supports multi-country lottery analysis for:
 
-| Game ID | Game | File |
-|---|---|---|
-| 5130 | OZ Lotto | `5130-results.csv` |
-| 5132 | Powerball | `5132-results.csv` |
-| 5237 | Set for Life | `5237-results.csv` |
+- **Australia** — Lotterywest draw games
+- **Korea** — Lotto 6/45 / 로또 6/45
+
+The project is built as a static GitHub Pages app using vanilla JavaScript modules. It focuses on historical draw visualisation, descriptive statistics, pattern insights, and random draw simulation.
+
+> This project is for data visualisation, learning, and portfolio purposes only. It does **not** predict lottery results, improve winning odds, or provide gambling advice.
+
+---
 
 ## Features
 
-- **Game Tabs:** Seamlessly switch between different lottery types.
-- **CSV Handling:** Upload your own CSV or load pre-existing data directly from the `data/` folder.
-- **Visualizations:** Recent 10-draw grid visualization highlighting winning, powerball, and supplementary numbers.
-- **Statistical Analysis:**
-  - Frequency analysis (most/least common numbers).
-  - Overdue number analysis.
-  - Basic odd/even and sum pattern summaries.
+### Multi-country mode
+
+Switch between Australia and Korea from the page header.
+
+- Australia mode renders English UI and Lotterywest games.
+- Korea mode renders Korean UI and Lotto 6/45 analysis.
+- The selected country, game, recent draw count, and view mode are saved locally using `localStorage`.
+
+### Recent draw visualisation
+
+- Configurable recent draw count
+- Table view for full number-grid inspection
+- Compact view with lottery-ball style results
+- Main numbers, bonus numbers, supplementary numbers, and Powerball-style numbers are displayed according to each game configuration
+
+### Quick analysis
+
+- Most frequent main numbers
+- Least frequent main numbers
+- Most overdue main numbers
+- Most frequent bonus / secondary numbers
+- Most overdue bonus / secondary numbers
+
+### Pattern insights
+
+The advanced analysis section includes:
+
+- Sum analysis
+- Odd / even patterns
+- Number spread
+- Repeat count from the previous draw
+- Consecutive number pairs
+- Observed vs theoretical random baseline comparison
+- Bar-chart style distribution summaries
+
+### Random draw simulator
+
+Generate random entries based on the selected game rule.
+
+Examples:
+
+- Australia Powerball: 7 main numbers + 1 Powerball
+- Korea Lotto 6/45: 6 main numbers + 1 bonus number
+
+Generated numbers are random and are intended only for simulation and entertainment.
+
+---
+
+## Supported Lottery Data
+
+The app currently supports:
+
+| Country | Games |
+|---|---|
+| Australia | OZ Lotto, Powerball, Set for Life |
+| Korea | Lotto 6/45 / 로또 6/45 |
+
+The internal data files are stored in the `data/` directory and are loaded by the app through configuration. End users do not need to know the internal dataset filenames.
+
+---
 
 ## Run Locally
 
-Because this project uses JavaScript ES modules, you must run it with a local web server (opening the HTML file directly will cause CORS errors).
+Because this project uses JavaScript ES modules, it must be served through a local web server. Opening `index.html` directly may cause module/CORS issues.
 
-Using Python:
+From the project root:
 
 ```bash
 python3 -m http.server 5500
 ```
 
-Then open your browser and navigate to: `http://localhost:5500`
+Then open:
+
+```text
+http://localhost:5500
+```
+
+---
+
+## Update Lottery Datasets
+
+The repository includes scripts for manually refreshing the static data files used by the GitHub Pages app.
+
+### Update Australia / Lotterywest data
+
+```bash
+node scripts/fetch-lotterywest.mjs all
+```
+
+This updates the Australia datasets used by OZ Lotto, Powerball, and Set for Life.
+
+### Update Korea Lotto 6/45 data
+
+```bash
+node scripts/fetch-korea-lotto.mjs mirror
+```
+
+This updates the Korea Lotto 6/45 CSV and JSON files used by the Korean analysis mode.
+
+### Typical update workflow
+
+```bash
+node scripts/fetch-lotterywest.mjs all
+node scripts/fetch-korea-lotto.mjs mirror
+
+git status
+git add data/*.csv data/*.json scripts/*.mjs .gitignore
+git commit -m "Update lottery result datasets"
+git push
+```
+
+The app intentionally tracks the generated CSV/JSON files because GitHub Pages serves them as static assets.
+
+---
 
 ## Project Structure
 
 ```text
 lotto-pattern-lab/
-│
 ├── index.html
+├── favicon.svg
+├── favicon.ico
 ├── README.md
+├── LICENSE
 │
 ├── css/
-│   └── style.css
+│   ├── base.css
+│   ├── layout.css
+│   ├── components.css
+│   ├── grid.css
+│   ├── stats.css
+│   ├── insights.css
+│   ├── generator.css
+│   ├── footer.css
+│   └── responsive.css
+│
+├── data/
+│   ├── australia result datasets
+│   └── korea lotto 6/45 datasets
 │
 ├── js/
 │   ├── main.js
 │   ├── config/
-│   │   └── gameConfigs.js
+│   │   ├── countries.js
+│   │   ├── gameConfigs.js
+│   │   └── games/
+│   ├── i18n/
 │   ├── parsers/
-│   │   ├── csvParser.js
-│   │   └── lotteryParser.js
 │   ├── renderers/
-│   │   ├── tabsRenderer.js
-│   │   ├── gridRenderer.js
-│   │   └── statsRenderer.js
 │   ├── analysis/
-│   │   ├── frequency.js
-│   │   ├── overdue.js
-│   │   └── patternStats.js
+│   ├── generator/
 │   └── utils/
-│       ├── dateUtils.js
-│       └── numberUtils.js
 │
-├── data/
-│   ├── 5130-results.csv
-│   ├── 5132-results.csv
-│   └── 5237-results.csv
+├── scripts/
+│   ├── fetch-lotterywest.mjs
+│   └── fetch-korea-lotto.mjs
 │
 └── models/
     └── README.md
 ```
 
-## Disclaimer & Data Attribution
+---
 
-**Data Source:** The lottery draw data (CSV files) used in this repository are sourced from Lotterywest.
+## Architecture Notes
 
-**Copyright Notice:** The copyright for the draw results and related lottery data resides with the State of Western Australia / Lotterywest. The data is used in this project strictly for personal, non-commercial, educational, and research purposes under the fair dealing provisions.
+The app is designed around configuration-driven lottery games.
 
-**Not Affiliated:** This project is an independent, open-source portfolio project and is not affiliated with, endorsed by, or associated with Lotterywest or the Western Australian Government in any way. This tool does not guarantee any winnings and is built purely for statistical analysis and programming demonstration.
+Each game defines:
+
+- country
+- locale
+- display name
+- data file
+- parser type
+- main number range/count
+- secondary number range/count
+- display labels and markers
+
+The shared renderers and analysis modules then reuse the same logic across different countries and game formats.
+
+This makes it easier to add more lottery games later without duplicating the whole UI.
+
+---
+
+## Data Attribution
+
+### Australia
+
+Australia lottery result data used in this project is based on publicly available Lotterywest result data.
+
+### Korea
+
+Korea Lotto 6/45 data used in this project is based on publicly available Lotto 6/45 draw result data. Users should always verify official results, prize details, rules, and eligibility requirements through the official Donghaeng Lottery website.
+
+---
+
+## Disclaimer
+
+This project is an independent, fan-made data visualisation and pattern exploration tool.
+
+It is **not** affiliated with, endorsed by, sponsored by, or officially operated by Lotterywest, Donghaeng Lottery, or any lottery operator/government body.
+
+Lottery numbers are random by nature. Any analysis, chart, statistic, pattern insight, or generated number suggestion shown by this project is for reference, learning, and entertainment purposes only.
+
+This project does **not** guarantee winnings, does **not** improve lottery odds, and should not be used as financial, gambling, legal, or investment advice.
+
+The creator is not legally responsible for any loss, decision, transaction, gambling activity, or misunderstanding that may occur from using this website or its generated results.
+
+All lottery names, game names, result data, and related materials belong to their respective owners.
+
+---
 
 ## License
 
-**Source Code:** MIT License.
+**Source code:** MIT License.
 
-**Dataset:** Subject to Lotterywest's copyright and terms of use. Please do not use the provided datasets for commercial purposes.
+**Lottery datasets:** Subject to the terms, copyright, and usage policies of the relevant data owners and lottery operators. The included data is used for personal, educational, non-commercial, and portfolio demonstration purposes.
+
+---
+
+© 2026 Daehwan Yeo. All rights reserved.

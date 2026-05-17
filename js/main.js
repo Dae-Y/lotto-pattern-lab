@@ -6,15 +6,20 @@ import {
   getGameConfig,
 } from "./config/gameConfigs.js";
 
-import { parseCsvLine } from "./parsers/csvParser.js";
+import { COUNTRIES } from "./config/countries.js";
+import { getCopyForLocale } from "./i18n/index.js";
 
-import { parseLotteryCsv } from "./parsers/lotteryParser.js";
+import { parseCsvLine } from "./parsers/csvParser.js";
+import { parseCsvForGame } from "./parsers/parserRouter.js";
+
 import { renderTabs } from "./renderers/tabsRenderer.js";
 import { renderRecentResults } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
 import { renderPatternInsights } from "./renderers/patternInsightsRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
+
+const PREF_KEY = "lottoPatternLab.preferences";
 
 const state = {
   activeCountry: "australia",
@@ -30,12 +35,11 @@ const elements = {
   headerTitle: document.querySelector("#headerTitle"),
   headerSubtitle: document.querySelector("#headerSubtitle"),
   countryBtns: document.querySelectorAll(".country-btn"),
-  australiaApp: document.querySelector("#australiaApp"),
-  koreaPlaceholder: document.querySelector("#koreaPlaceholder"),
   
   tabs: document.querySelector("#tabs"),
   csvInput: document.querySelector("#csvInput"),
   loadSampleBtn: document.querySelector("#loadSampleBtn"),
+  uploadCsvText: document.querySelector("#uploadCsvText"),
   clearBtn: document.querySelector("#clearBtn"),
   status: document.querySelector("#status"),
   compactMeta: document.querySelector("#compactMeta"),
@@ -46,13 +50,39 @@ const elements = {
   stats: document.querySelector("#stats"),
   patternInsights: document.querySelector("#patternInsights"),
   generator: document.querySelector("#generator"),
+
+  recentEyebrow: document.querySelector("#recentEyebrow"),
+  recentTitle: document.querySelector("#recentTitle"),
+  recentCountText: document.querySelector("#recentCountText"),
+  quickAnalysisEyebrow: document.querySelector("#quickAnalysisEyebrow"),
+  quickAnalysisTitle: document.querySelector("#quickAnalysisTitle"),
+
+  disclaimer1: document.querySelector("#disclaimer1"),
+  disclaimer2: document.querySelector("#disclaimer2"),
+  disclaimer3: document.querySelector("#disclaimer3"),
+  disclaimer4: document.querySelector("#disclaimer4"),
+  disclaimer5: document.querySelector("#disclaimer5"),
 };
 
 init();
 
-function init() {
+async function init() {
+  loadPreferences();
+  validateState();
+
+  updateStaticUiText();
+  
+  elements.countryBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
+  });
+
   renderAll();
 
+  if (!state.drawsByGameId[state.activeGameId]) {
+    await loadSampleCsvForActiveGame({ force: true });
+  }
+
+  // Bind events
   elements.countryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       setActiveCountry(btn.dataset.country);
@@ -60,7 +90,7 @@ function init() {
   });
 
   elements.loadSampleBtn.addEventListener("click", () => {
-    loadSampleCsvForActiveGame();
+    loadSampleCsvForActiveGame({ force: true });
   });
 
   elements.csvInput.addEventListener("change", handleCsvUpload);
@@ -78,43 +108,160 @@ function init() {
   elements.compactViewBtn.addEventListener("click", () => {
     setViewMode("compact");
   });
-
-  loadSampleCsvForActiveGame();
 }
 
-function setActiveCountry(country) {
-  state.activeCountry = country;
+function loadPreferences() {
+  try {
+    const raw = localStorage.getItem(PREF_KEY);
+    if (!raw) return;
+    const pref = JSON.parse(raw);
+    
+    if (pref.activeCountry) state.activeCountry = pref.activeCountry;
+    if (pref.activeGameId) state.activeGameId = pref.activeGameId;
+    if (pref.recentDrawLimit) state.recentDrawLimit = pref.recentDrawLimit;
+    if (pref.recentViewMode) state.recentViewMode = pref.recentViewMode;
+  } catch (e) {
+    console.error("Failed to load preferences", e);
+  }
+}
 
-  // Update active button state
+function savePreferences() {
+  try {
+    const pref = {
+      activeCountry: state.activeCountry,
+      activeGameId: state.activeGameId,
+      recentDrawLimit: state.recentDrawLimit,
+      recentViewMode: state.recentViewMode,
+    };
+    localStorage.setItem(PREF_KEY, JSON.stringify(pref));
+  } catch (e) {
+    console.error("Failed to save preferences", e);
+  }
+}
+
+function getCountry(countryId) {
+  return COUNTRIES.find((country) => country.id === countryId);
+}
+
+function getDefaultGameIdForCountry(countryId) {
+  const country = getCountry(countryId);
+  return country?.defaultGameId ?? DEFAULT_GAME_ID;
+}
+
+function isValidCountry(countryId) {
+  return COUNTRIES.some((country) => country.id === countryId);
+}
+
+function isGameInCountry(gameId, countryId) {
+  const game = getGameConfig(gameId);
+  return Boolean(game && game.country === countryId);
+}
+
+function validateState() {
+  if (!isValidCountry(state.activeCountry)) {
+    state.activeCountry = "australia";
+  }
+
+  if (!isGameInCountry(state.activeGameId, state.activeCountry)) {
+    state.activeGameId = getDefaultGameIdForCountry(state.activeCountry);
+  }
+
+  if (!Number.isInteger(state.recentDrawLimit) || state.recentDrawLimit < 1) {
+    state.recentDrawLimit = 10;
+  }
+
+  if (!["table", "compact"].includes(state.recentViewMode)) {
+    state.recentViewMode = "table";
+  }
+}
+
+function getVisibleGames() {
+  return GAME_CONFIGS.filter((game) => game.country === state.activeCountry);
+}
+
+function getActiveCopy() {
+  const country = getCountry(state.activeCountry);
+  return getCopyForLocale(country ? country.locale : "en-AU");
+}
+
+function setActiveCountry(countryId) {
+  state.activeCountry = countryId;
+  state.activeGameId = getDefaultGameIdForCountry(countryId);
+
+  validateState();
+  savePreferences();
+
   elements.countryBtns.forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.country === country);
+    btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
   });
 
-  if (country === "australia") {
-    elements.australiaApp.style.display = "block";
-    elements.koreaPlaceholder.style.display = "none";
-    
-    elements.headerEyebrow.textContent = "Lotterywest CSV Visualiser";
-    elements.headerTitle.textContent = "Lotto Pattern Lab";
-    elements.headerSubtitle.textContent = "Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.";
-  } else if (country === "korea") {
-    elements.australiaApp.style.display = "none";
-    elements.koreaPlaceholder.style.display = "block";
-    
-    elements.headerEyebrow.textContent = "동행복권 분석기";
-    elements.headerTitle.textContent = "한국 로또 6/45 Lab";
-    elements.headerSubtitle.textContent = "한국 로또 6/45 분석 기능은 현재 제작 중입니다.";
+  updateStaticUiText();
+  renderAll();
+
+  if (!state.drawsByGameId[state.activeGameId]) {
+    loadSampleCsvForActiveGame({ force: true });
+  }
+}
+
+function handleTabChange(gameId) {
+  const config = getGameConfig(gameId);
+
+  if (!config) {
+    console.error("Invalid game tab:", gameId);
+    return;
+  }
+
+  state.activeGameId = gameId;
+  state.activeCountry = config.country;
+
+  validateState();
+  savePreferences();
+  renderAll();
+
+  if (!state.drawsByGameId[gameId]) {
+    loadSampleCsvForActiveGame({ force: true });
+  }
+}
+
+function updateStaticUiText() {
+  const copy = getActiveCopy();
+
+  if (elements.headerEyebrow) elements.headerEyebrow.textContent = copy.header.eyebrow;
+  if (elements.headerTitle) elements.headerTitle.textContent = copy.header.title;
+  if (elements.headerSubtitle) elements.headerSubtitle.textContent = copy.header.subtitle;
+
+  if (elements.loadSampleBtn) elements.loadSampleBtn.textContent = copy.controls.loadData;
+  if (elements.uploadCsvText) elements.uploadCsvText.textContent = copy.controls.uploadCsv;
+  if (elements.clearBtn) elements.clearBtn.textContent = copy.controls.clear;
+
+  if (elements.recentEyebrow) elements.recentEyebrow.textContent = copy.recent.eyebrow;
+  if (elements.recentTitle) elements.recentTitle.textContent = copy.recent.title;
+  if (elements.recentCountText) elements.recentCountText.textContent = copy.recent.drawCount;
+  if (elements.tableViewBtn) elements.tableViewBtn.textContent = copy.recent.tableView;
+  if (elements.compactViewBtn) elements.compactViewBtn.textContent = copy.recent.compactView;
+
+  if (elements.quickAnalysisEyebrow) elements.quickAnalysisEyebrow.textContent = copy.quickAnalysis.eyebrow;
+  if (elements.quickAnalysisTitle) elements.quickAnalysisTitle.textContent = copy.quickAnalysis.title;
+
+  if (copy.footer) {
+    if (elements.disclaimer1) elements.disclaimer1.textContent = copy.footer.disclaimer1;
+    if (elements.disclaimer2) elements.disclaimer2.textContent = copy.footer.disclaimer2;
+    if (elements.disclaimer3) elements.disclaimer3.textContent = copy.footer.disclaimer3;
+    if (elements.disclaimer4) elements.disclaimer4.textContent = copy.footer.disclaimer4;
+    if (elements.disclaimer5) elements.disclaimer5.textContent = copy.footer.disclaimer5;
   }
 }
 
 function handleDrawCountChange() {
   const parsed = parseInt(elements.recentDrawCount.value, 10);
   state.recentDrawLimit = parsed > 0 ? parsed : 1;
+  savePreferences();
   renderRecent();
 }
 
 function setViewMode(mode) {
   state.recentViewMode = mode;
+  savePreferences();
 
   elements.tableViewBtn.classList.toggle("active", mode === "table");
   elements.compactViewBtn.classList.toggle("active", mode === "compact");
@@ -124,28 +271,48 @@ function setViewMode(mode) {
 
 function renderRecent() {
   const config = getGameConfig(state.activeGameId);
+  if (!config) return;
+
   const draws = state.drawsByGameId[state.activeGameId] ?? [];
+  const copy = getActiveCopy();
 
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,
-  });
+  }, copy);
 }
 
 function renderAll() {
-  const config = getGameConfig(state.activeGameId);
-  const draws = state.drawsByGameId[state.activeGameId] ?? [];
+  const visibleGames = getVisibleGames();
+  
+  if (visibleGames.length === 0) {
+    console.error("No visible games for country:", state.activeCountry);
+    state.activeCountry = "australia";
+    state.activeGameId = getDefaultGameIdForCountry("australia");
+    return renderAll();
+  }
 
-  renderTabs(elements.tabs, GAME_CONFIGS, state.activeGameId, handleTabChange);
-  renderCompactMeta(elements.compactMeta, draws, config);
+  const config = getGameConfig(state.activeGameId);
+  if (!config) {
+    state.activeCountry = "australia";
+    state.activeGameId = DEFAULT_GAME_ID;
+    savePreferences();
+    return renderAll();
+  }
+
+  const draws = state.drawsByGameId[state.activeGameId] ?? [];
+  const copy = getActiveCopy();
+
+  renderTabs(elements.tabs, visibleGames, state.activeGameId, handleTabChange);
+  renderCompactMeta(elements.compactMeta, draws, config, copy);
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,
-  });
-  renderStats(elements.stats, draws, config);
+  }, copy);
+  renderStats(elements.stats, draws, config, copy);
 
   try {
-    renderPatternInsights(elements.patternInsights, draws, config);
+    renderPatternInsights(elements.patternInsights, draws, config, copy);
   } catch (error) {
     console.error("Pattern Insights failed:", error);
   
@@ -158,35 +325,47 @@ function renderAll() {
     }
   }
 
-  renderGenerator(elements.generator, config);
+  renderGenerator(elements.generator, config, copy);
 }
 
-function handleTabChange(gameId) {
-  state.activeGameId = gameId;
-  renderAll();
+async function loadSampleCsvForActiveGame({ force = false } = {}) {
+  validateState();
 
-  if (!state.drawsByGameId[gameId]) {
-    loadSampleCsvForActiveGame();
-  }
-}
-
-async function loadSampleCsvForActiveGame() {
   const config = getGameConfig(state.activeGameId);
-  const path = `./data/${config.fileName}`;
-  const sourceLabel = "Lotterywest public results data";
 
-  setStatus(`Loading ${config.name} data...`);
+  if (!config) {
+    setStatus("No valid game selected.", true);
+    return;
+  }
+
+  if (!force && state.drawsByGameId[state.activeGameId]) {
+    renderAll();
+    return;
+  }
+
+  const path = `./data/${config.fileName}`;
+  const cacheBustedPath = `${path}?v=${Date.now()}`;
+  const copy = getActiveCopy();
+  
+  // Try to use a loading message from copy or fallback
+  const isKorean = state.activeCountry === "korea";
+  const loadingMsg = isKorean ? `${config.name} 데이터를 불러오는 중...` : `Loading ${config.name} data...`;
+  setStatus(loadingMsg);
 
   try {
-    const response = await fetch(path);
+    const response = await fetch(cacheBustedPath, {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
-      throw new Error(`Could not load ${config.name} data.`);
+      throw new Error(`Could not load ${path}`);
     }
 
     const csvText = await response.text();
+    const sourceLabel = config.sourceLabel || "Uploaded CSV";
     loadCsvText(csvText, config, sourceLabel);
   } catch (error) {
+    console.error("Failed to load CSV from data folder:", error);
     setStatus(
       `Could not load ${config.name} data. Upload the CSV manually or run the project with a local server.`,
       true,
@@ -201,7 +380,6 @@ function handleCsvUpload(event) {
     return;
   }
 
-  const sourceLabel = "Uploaded CSV";
   const reader = new FileReader();
 
   reader.onload = () => {
@@ -216,7 +394,7 @@ function handleCsvUpload(event) {
 
     if (!detectedGameId) {
       setStatus(
-        "Could not detect the lottery game from this CSV. Please use an official Lotterywest-style CSV with Winning Number and Powerball/Supplementary columns.",
+        "Could not detect the lottery game from this CSV.",
         true,
       );
       elements.csvInput.value = "";
@@ -225,9 +403,21 @@ function handleCsvUpload(event) {
 
     if (detectedGameId !== state.activeGameId) {
       state.activeGameId = detectedGameId;
+      // also change the country tab if needed
+      const detectedConfig = getGameConfig(detectedGameId);
+      if (detectedConfig && detectedConfig.country !== state.activeCountry) {
+        state.activeCountry = detectedConfig.country;
+        savePreferences();
+        
+        elements.countryBtns.forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
+        });
+        updateStaticUiText();
+      }
     }
 
     const config = getGameConfig(state.activeGameId);
+    const sourceLabel = config.sourceLabel || "Uploaded CSV";
     loadCsvText(csvText, config, sourceLabel);
     elements.csvInput.value = "";
   };
@@ -241,7 +431,7 @@ function handleCsvUpload(event) {
 
 function loadCsvText(csvText, config, sourceLabel) {
   try {
-    const draws = parseLotteryCsv(csvText, config);
+    const draws = parseCsvForGame(csvText, config);
 
     if (draws.length === 0) {
       throw new Error("No valid current-format draw rows found.");
@@ -250,9 +440,12 @@ function loadCsvText(csvText, config, sourceLabel) {
     state.drawsByGameId[config.id] = draws;
     state.sourceByGameId[config.id] = sourceLabel;
 
-    setStatus(
-      `${config.name}: loaded ${draws.length.toLocaleString()} current-format draws from ${sourceLabel.toLowerCase()}.`,
-    );
+    const isKorean = state.activeCountry === "korea";
+    const msg = isKorean
+      ? `${config.name}: ${draws.length.toLocaleString()}개 회차 데이터를 불러왔습니다.`
+      : `${config.name}: loaded ${draws.length.toLocaleString()} current-format draws from ${sourceLabel.toLowerCase()}.`;
+    
+    setStatus(msg);
 
     renderAll();
   } catch (error) {
@@ -266,30 +459,33 @@ function clearActiveGameData() {
 
   const config = getGameConfig(state.activeGameId);
 
-  setStatus(`${config.name} data cleared.`);
+  const isKorean = state.activeCountry === "korea";
+  setStatus(isKorean ? `${config.name} 데이터가 초기화되었습니다.` : `${config.name} data cleared.`);
   renderAll();
 }
 
-function renderCompactMeta(container, draws, config) {
+function renderCompactMeta(container, draws, config, copy) {
   if (!draws || draws.length === 0) {
+    const isKorean = state.activeCountry === "korea";
     container.innerHTML = `
-      <div class="meta-main">No data loaded</div>
-      <div class="meta-source">Load a CSV file to begin.</div>
+      <div class="meta-main">${isKorean ? "데이터가 없습니다" : "No data loaded"}</div>
+      <div class="meta-source">${isKorean ? "CSV 파일을 불러와주세요." : "Load a CSV file to begin."}</div>
     `;
     return;
   }
 
   const latestDraw = draws[0];
   const source = state.sourceByGameId[config.id] ?? "-";
+  const isKorean = state.activeCountry === "korea";
 
   container.innerHTML = `
     <div class="meta-main">
-      <strong>${draws.length.toLocaleString()}</strong> draws ·
-      Latest <strong>#${latestDraw.drawNumber}</strong> ·
-      ${formatDateLong(latestDraw.drawDate)}
+      <strong>${draws.length.toLocaleString()}</strong> ${isKorean ? "회차" : "draws"} ·
+      ${isKorean ? "최신" : "Latest"} <strong>#${latestDraw.drawNumber}</strong> ·
+      ${formatDateLong(latestDraw.drawDate, copy?.locale ?? config.locale ?? "en-AU")}
     </div>
     <div class="meta-source">
-      Source: ${source}
+      ${isKorean ? "출처:" : "Source:"} ${source}
     </div>
   `;
 }
