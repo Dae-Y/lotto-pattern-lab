@@ -1,5 +1,6 @@
 export const koKR = {
   locale: "ko-KR",
+  officialLinkLabel: "공식 결과",
   header: {
     eyebrow: "동행복권 로또 6/45 분석기",
     title: "한국 로또 6/45 분석",
@@ -20,6 +21,7 @@ export const koKR = {
     legendSecondary: "B = 보너스번호",
     draw: "회차",
     date: "추첨일",
+    scrollHelper: "모든 번호 열을 보려면 표를 좌우로 스크롤하세요.",
   },
   quickAnalysis: {
     eyebrow: "빠른 분석",

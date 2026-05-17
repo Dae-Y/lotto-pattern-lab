@@ -33,15 +33,24 @@ export function renderRecentResults(container, draws, config, options = {}, copy
     container.appendChild(warning);
   }
 
-  // Scroll area wrapper
-  const scrollArea = document.createElement("div");
-  scrollArea.className = "recent-scroll-area";
-
   if (viewMode === "compact") {
+    const scrollArea = document.createElement("div");
+    scrollArea.className = "recent-scroll-area";
     scrollArea.appendChild(renderCompactView(recentDraws, config, copy));
+    container.appendChild(scrollArea);
   } else {
     const legend = createLegend(config, copy);
     container.appendChild(legend);
+
+    if (copy?.recent?.scrollHelper || true) {
+      const helper = document.createElement("div");
+      helper.className = "recent-scroll-helper";
+      helper.style.fontSize = "13px";
+      helper.style.color = "var(--muted)";
+      helper.style.marginBottom = "8px";
+      helper.textContent = copy?.recent?.scrollHelper ?? "Tip: Scroll horizontally to view all number columns.";
+      container.appendChild(helper);
+    }
 
     const wrapper = document.createElement("div");
     wrapper.className = "grid-wrapper";
@@ -52,10 +61,8 @@ export function renderRecentResults(container, draws, config, options = {}, copy
     table.appendChild(createTableBody(recentDraws, config, copy));
 
     wrapper.appendChild(table);
-    scrollArea.appendChild(wrapper);
+    container.appendChild(wrapper);
   }
-
-  container.appendChild(scrollArea);
 }
 
 /* ── Compact View ── */
@@ -145,25 +152,27 @@ function createTableHead(config, copy) {
   const drawLabel = copy ? copy.recent.draw : "Draw";
   const dateLabel = copy ? copy.recent.date : "Date";
   
-  groupRow.appendChild(createHeaderCell(drawLabel, "sticky-col", 2));
-  groupRow.appendChild(createHeaderCell(dateLabel, "sticky-col second", 2));
+  groupRow.appendChild(createHeaderCell(drawLabel, "sticky-col sticky-corner", 2));
+  groupRow.appendChild(createHeaderCell(dateLabel, "sticky-col second sticky-corner", 2));
 
   const mainHeaderStr = copy && copy.recent.draw === "회차" ? `${config.main.label} 1\u2013${config.main.range}` : `${config.main.label} Numbers 1-${config.main.range}`;
   const mainHeader = createHeaderCell(
-    mainHeaderStr,
     "",
+    "number-group-header",
     1,
   );
+  mainHeader.innerHTML = `<span class="group-header-label">${mainHeaderStr}</span>`;
   mainHeader.colSpan = config.main.range;
   groupRow.appendChild(mainHeader);
 
   if (!config.secondary.sharesMainGrid) {
     const secondaryHeaderStr = copy && copy.recent.draw === "회차" ? `${config.secondary.label} 1\u2013${config.secondary.range}` : `${config.secondary.label} 1-${config.secondary.range}`;
     const secondaryHeader = createHeaderCell(
-      secondaryHeaderStr,
       "",
+      "number-group-header",
       1,
     );
+    secondaryHeader.innerHTML = `<span class="group-header-label">${secondaryHeaderStr}</span>`;
     secondaryHeader.colSpan = config.secondary.range;
     groupRow.appendChild(secondaryHeader);
   }

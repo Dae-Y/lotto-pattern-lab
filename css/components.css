@@ -113,3 +113,16 @@ button,
   background: radial-gradient(circle at 35% 30%, #f4ffe8 0%, #9be564 45%, #45a832 100%);
   color: #12330d;
 }
+
+.official-source-link {
+  color: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.9;
+}
+
+.official-source-link:hover {
+  opacity: 1;
+  border-bottom-style: solid;
+}

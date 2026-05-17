@@ -1,5 +1,6 @@
 export const enAU = {
   locale: "en-AU",
+  officialLinkLabel: "Official charts",
   header: {
     eyebrow: "Lotterywest CSV Visualiser",
     title: "Lotto Pattern Lab",
@@ -20,6 +21,7 @@ export const enAU = {
     legendSecondary: "S = Supplementary / P = Powerball",
     draw: "Draw",
     date: "Date",
+    scrollHelper: "Scroll horizontally to view all number columns.",
   },
   quickAnalysis: {
     eyebrow: "Quick analysis",
@@ -36,40 +38,40 @@ export const enAU = {
     eyebrow: "Deep analysis",
     title: "Pattern Insights",
     subtitle: "Explore how numbers distribute, repeat, spread, and compare to random expectations.",
-    
+
     sumTitle: "Sum of numbers",
     sumDescription: "Shows the total value when all main numbers are added together.",
-    
+
     oddEvenTitle: "Odd vs Even",
     oddEvenDescription: "Compares the count of odd and even numbers in each draw.",
-    
+
     spreadTitle: "Number spread",
     spreadDescription: "Measures the distance between the smallest and largest numbers.",
-    
+
     repeatTitle: "Repeats from last draw",
     repeatDescription: "Shows how many numbers usually repeat from the previous draw.",
-    
+
     consecutiveTitle: "Consecutive pairs",
     consecutiveDescription: "Tracks pairs of adjacent numbers like 7-8 or 18-19.",
-    
+
     expectedTitle: "Observed vs Expected",
     expectedDescription: "Compares actual averages against the theoretical random expectation.",
-    
+
     visualEyebrow: "Visual distribution",
     barCharts: "Bar Charts",
     latestBadgeText: "Latest",
     latestExplanationPrefix: "The Latest badge refers to",
     latestExplanationSuffix: ".",
-    
+
     oddEvenDistribution: "Odd/Even Distribution",
     oddEvenDistributionDescription: "Shows how often each odd/even split appears.",
-    
+
     sumDistribution: "Sum Distribution",
     sumDistributionDescription: "Groups draw sums into ranges.",
-    
+
     repeatDistribution: "Repeat Distribution",
     repeatDistributionDescription: "Shows how many numbers usually repeat from the previous draw.",
-    
+
     consecutiveDistribution: "Consecutive Pair Distribution",
     consecutiveDistributionDescription: "Shows how many consecutive pairs appear.",
   },

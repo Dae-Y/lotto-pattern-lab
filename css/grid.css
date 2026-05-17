@@ -114,24 +114,48 @@
 /* ── Table Styles ── */
 
 .grid-wrapper {
+  --draw-col-width: 52px;
+  --date-col-width: 82px;
+  --sticky-left-width: calc(var(--draw-col-width) + var(--date-col-width));
   width: 100%;
-  overflow-x: auto;
+  max-height: 560px;
+  overflow: auto;
   border: 1px solid var(--border);
   border-radius: 14px;
 }
 
+.grid-wrapper::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.grid-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.grid-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
 .result-table {
   width: max-content;
-  border-collapse: collapse;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 11px;
   background: white;
   margin-left: auto;
   margin-right: auto;
+  border-top: 1px solid #cfd6e4;
+  border-left: 1px solid #cfd6e4;
 }
 
 .result-table th,
 .result-table td {
-  border: 1px solid #cfd6e4;
+  border-right: 1px solid #cfd6e4;
+  border-bottom: 1px solid #cfd6e4;
   text-align: center;
   padding: 0;
   height: 25px;
@@ -139,33 +163,98 @@
 
 .result-table th {
   background: #f1f4f9;
+  background-clip: padding-box;
   font-weight: 800;
   padding: 2px 4px;
   white-space: nowrap;
 }
 
+.result-table thead tr:first-child th {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: #f1f4f9;
+  background-clip: padding-box;
+  height: 29px; /* roughly 25px height + 4px padding */
+}
+
+.result-table thead tr:nth-child(2) th {
+  position: sticky;
+  top: 29px;
+  z-index: 35;
+  background: #f1f4f9;
+  background-clip: padding-box;
+  height: 29px;
+}
+
+.result-table thead .sticky-col,
+.result-table thead .sticky-col.second {
+  z-index: 80;
+  box-shadow: none;
+}
+
+.result-table thead .sticky-corner {
+  top: 0;
+  z-index: 500 !important;
+  background: #f1f4f9 !important;
+  background-clip: padding-box;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  overflow: hidden;
+}
+
+.result-table thead tr:first-child th:not(.sticky-corner) {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.result-table thead tr:nth-child(2) th {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.result-table thead .sticky-corner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+  pointer-events: none;
+  z-index: 101;
+}
+
 .result-table .sticky-col {
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 25;
   background: #f8fafc;
-  min-width: 52px;
-  width: 52px;
-  max-width: 52px;
+  background-clip: padding-box;
+  min-width: var(--draw-col-width);
+  width: var(--draw-col-width);
+  max-width: var(--draw-col-width);
   padding: 0 4px;
 }
 
 .result-table .sticky-col.second {
-  left: 52px;
-  min-width: 82px;
-  width: 82px;
-  max-width: 82px;
+  left: var(--draw-col-width);
+  z-index: 25;
+  background: #f8fafc;
+  background-clip: padding-box;
+  min-width: var(--date-col-width);
+  width: var(--date-col-width);
+  max-width: var(--date-col-width);
   padding: 0 4px;
+}
+
+.result-table tbody .sticky-col,
+.result-table tbody .sticky-col.second {
+  box-shadow: inset -1px 0 0 var(--border);
 }
 
 .result-table td.sticky-col,
 .result-table td.sticky-col.second {
   background: white;
+  background-clip: padding-box;
   font-weight: 700;
 }
 
@@ -271,4 +360,36 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* ── Sticky Group Header ── */
+
+.number-group-header {
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+  background: var(--surface, #ffffff);
+}
+
+.number-group-header .group-header-label {
+  display: inline-block;
+  position: sticky;
+  left: calc(var(--sticky-left-width) + 12px);
+  max-width: calc(100vw - var(--sticky-left-width) - 48px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 30;
+}
+
+@media (max-width: 720px) {
+  .number-group-header .group-header-label {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .number-group-header .group-header-label {
+    visibility: hidden;
+  }
 }

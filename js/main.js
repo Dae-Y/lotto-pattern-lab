@@ -478,6 +478,11 @@ function renderCompactMeta(container, draws, config, copy) {
   const source = state.sourceByGameId[config.id] ?? "-";
   const isKorean = state.activeCountry === "korea";
 
+  const officialLinkLabel = copy.officialLinkLabel ?? "Official source";
+  const officialLinkHtml = config.officialUrl
+    ? ` · <a class="official-source-link" href="${config.officialUrl}" target="_blank" rel="noopener noreferrer">${officialLinkLabel} ↗</a>`
+    : "";
+
   container.innerHTML = `
     <div class="meta-main">
       <strong>${draws.length.toLocaleString()}</strong> ${isKorean ? "회차" : "draws"} ·
@@ -485,7 +490,7 @@ function renderCompactMeta(container, draws, config, copy) {
       ${formatDateLong(latestDraw.drawDate, copy?.locale ?? config.locale ?? "en-AU")}
     </div>
     <div class="meta-source">
-      ${isKorean ? "출처:" : "Source:"} ${source}
+      ${isKorean ? "출처:" : "Source:"} ${source}${officialLinkHtml}
     </div>
   `;
 }

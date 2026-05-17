@@ -8,6 +8,7 @@ export const AUSTRALIA_GAMES = [
     shortName: "OZ Lotto",
     fileName: "5130-results.csv",
     sourceLabel: "Lotterywest public results data",
+    officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1474,
     main: {
       label: "Winning",
@@ -37,6 +38,7 @@ export const AUSTRALIA_GAMES = [
     shortName: "Powerball",
     fileName: "5132-results.csv",
     sourceLabel: "Lotterywest public results data",
+    officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1144,
     main: {
       label: "Winning",
@@ -66,6 +68,7 @@ export const AUSTRALIA_GAMES = [
     shortName: "Set for Life",
     fileName: "5237-results.csv",
     sourceLabel: "Lotterywest public results data",
+    officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1691,
     main: {
       label: "Winning",
