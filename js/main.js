@@ -17,6 +17,7 @@ import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
 const state = {
+  activeCountry: "australia",
   activeGameId: DEFAULT_GAME_ID,
   drawsByGameId: {},
   sourceByGameId: {},
@@ -25,6 +26,13 @@ const state = {
 };
 
 const elements = {
+  headerEyebrow: document.querySelector("#headerEyebrow"),
+  headerTitle: document.querySelector("#headerTitle"),
+  headerSubtitle: document.querySelector("#headerSubtitle"),
+  countryBtns: document.querySelectorAll(".country-btn"),
+  australiaApp: document.querySelector("#australiaApp"),
+  koreaPlaceholder: document.querySelector("#koreaPlaceholder"),
+  
   tabs: document.querySelector("#tabs"),
   csvInput: document.querySelector("#csvInput"),
   loadSampleBtn: document.querySelector("#loadSampleBtn"),
@@ -44,6 +52,12 @@ init();
 
 function init() {
   renderAll();
+
+  elements.countryBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      setActiveCountry(btn.dataset.country);
+    });
+  });
 
   elements.loadSampleBtn.addEventListener("click", () => {
     loadSampleCsvForActiveGame();
@@ -66,6 +80,31 @@ function init() {
   });
 
   loadSampleCsvForActiveGame();
+}
+
+function setActiveCountry(country) {
+  state.activeCountry = country;
+
+  // Update active button state
+  elements.countryBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.country === country);
+  });
+
+  if (country === "australia") {
+    elements.australiaApp.style.display = "block";
+    elements.koreaPlaceholder.style.display = "none";
+    
+    elements.headerEyebrow.textContent = "Lotterywest CSV Visualiser";
+    elements.headerTitle.textContent = "Lotto Pattern Lab";
+    elements.headerSubtitle.textContent = "Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.";
+  } else if (country === "korea") {
+    elements.australiaApp.style.display = "none";
+    elements.koreaPlaceholder.style.display = "block";
+    
+    elements.headerEyebrow.textContent = "동행복권 분석기";
+    elements.headerTitle.textContent = "한국 로또 6/45 Lab";
+    elements.headerSubtitle.textContent = "한국 로또 6/45 분석 기능은 현재 제작 중입니다.";
+  }
 }
 
 function handleDrawCountChange() {

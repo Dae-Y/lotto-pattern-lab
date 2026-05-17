@@ -18,109 +18,145 @@
 </head>
 <body>
   <header class="app-header">
-    <div>
-      <p class="eyebrow">Lotterywest CSV Visualiser</p>
-      <h1>Lotto Pattern Lab</h1>
-      <p class="subtitle">
-        Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.
-      </p>
+    <div class="app-header-inner">
+      <div class="app-header-copy">
+        <p class="eyebrow" id="headerEyebrow">Lotterywest CSV Visualiser</p>
+        <h1 id="headerTitle">Lotto Pattern Lab</h1>
+        <p class="subtitle" id="headerSubtitle">
+          Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.
+        </p>
+      </div>
+
+      <div class="country-switcher" role="group" aria-label="Country selector">
+        <button class="country-btn active" type="button" data-country="australia">
+          <img src="https://flagcdn.com/24x18/au.png" class="country-flag" width="20" alt="" aria-hidden="true">
+          <span>Australia</span>
+        </button>
+        <button class="country-btn" type="button" data-country="korea">
+          <img src="https://flagcdn.com/24x18/kr.png" class="country-flag" width="20" alt="" aria-hidden="true">
+          <span>한국</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="app-shell">
-    <section class="panel">
-      <div class="top-panel-header">
-        <div class="tabs" id="tabs"></div>
-        <div class="compact-meta" id="compactMeta"></div>
-      </div>
-
-      <div class="controls">
-        <button id="loadSampleBtn" class="primary-btn">
-          Load CSV from data folder
-        </button>
-
-        <label class="file-label">
-          Upload CSV
-          <input id="csvInput" type="file" accept=".csv,text/csv" />
-        </label>
-
-        <button id="clearBtn" class="secondary-btn">
-          Clear
-        </button>
-      </div>
-
-      <p id="status" class="status-text">
-        Select a game tab, then load a CSV file.
-      </p>
-    </section>
-
-    <section class="panel wide-panel">
-      <div class="section-heading recent-heading">
-        <div>
-          <p class="eyebrow">Recent results</p>
-          <h2>Recent Draws</h2>
+  <div id="australiaApp" style="display: block;">
+    <main class="app-shell">
+      <section class="panel">
+        <div class="top-panel-header">
+          <div class="tabs" id="tabs"></div>
+          <div class="compact-meta" id="compactMeta"></div>
         </div>
 
-        <div class="recent-controls">
-          <label class="recent-count-label">
-            Draw count
-            <input id="recentDrawCount" type="number" min="1" step="1" value="10" />
+        <div class="controls">
+          <button id="loadSampleBtn" class="primary-btn">
+            Load CSV from data folder
+          </button>
+
+          <label class="file-label">
+            Upload CSV
+            <input id="csvInput" type="file" accept=".csv,text/csv" />
           </label>
 
-          <div class="view-toggle" role="group" aria-label="Recent draw view mode">
-            <button id="tableViewBtn" class="view-toggle-btn active" type="button">
-              Table View
-            </button>
-            <button id="compactViewBtn" class="view-toggle-btn" type="button">
-              Compact View
-            </button>
+          <button id="clearBtn" class="secondary-btn">
+            Clear
+          </button>
+        </div>
+
+        <p id="status" class="status-text">
+          Select a game tab, then load a CSV file.
+        </p>
+      </section>
+
+      <section class="panel wide-panel">
+        <div class="section-heading recent-heading">
+          <div>
+            <p class="eyebrow">Recent results</p>
+            <h2>Recent Draws</h2>
+          </div>
+
+          <div class="recent-controls">
+            <label class="recent-count-label">
+              Draw count
+              <input id="recentDrawCount" type="number" min="1" step="1" value="10" />
+            </label>
+
+            <div class="view-toggle" role="group" aria-label="Recent draw view mode">
+              <button id="tableViewBtn" class="view-toggle-btn active" type="button">
+                Table View
+              </button>
+              <button id="compactViewBtn" class="view-toggle-btn" type="button">
+                Compact View
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="recentGrid"></div>
-    </section>
+        <div id="recentGrid"></div>
+      </section>
 
-    <section class="panel">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Quick analysis</p>
-          <h2>Quick Analysis</h2>
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Quick analysis</p>
+            <h2>Quick Analysis</h2>
+          </div>
+        </div>
+
+        <div id="stats"></div>
+      </section>
+
+      <section class="panel" id="patternInsightsPanel">
+        <div id="patternInsights"></div>
+      </section>
+
+      <section class="panel" id="generatorPanel">
+        <div id="generator"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="disclaimer-card">
+        <div class="disclaimer-header">
+          <span class="disclaimer-icon">※</span>
+          <h2>Disclaimer</h2>
+        </div>
+
+        <div class="disclaimer-body">
+          <p>Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
+          <p>This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
+          <p>Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
+          <p>Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
+          <p>Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
+        </div>
+
+        <div class="copyright">
+          © 2026 Daehwan Yeo. All rights reserved.
         </div>
       </div>
+    </footer>
+  </div>
 
-      <div id="stats"></div>
-    </section>
-
-    <section class="panel" id="patternInsightsPanel">
-      <div id="patternInsights"></div>
-    </section>
-
-    <section class="panel" id="generatorPanel">
-      <div id="generator"></div>
-    </section>
-  </main>
-
-  <footer class="app-footer">
-    <div class="disclaimer-card">
-      <div class="disclaimer-header">
-        <span class="disclaimer-icon">※</span>
-        <h2>Disclaimer</h2>
-      </div>
-
-      <div class="disclaimer-body">
-        <p>Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
-        <p>This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
-        <p>Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
-        <p>Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
-        <p>Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
-      </div>
-
-      <div class="copyright">
-        © 2026 Daehwan Yeo. All rights reserved.
-      </div>
-    </div>
-  </footer>
+  <div id="koreaPlaceholder" style="display: none;">
+    <main class="app-shell">
+      <section class="panel" style="text-align: center; padding: 60px 20px;">
+        <p class="eyebrow" style="color: var(--primary);">한국 복권 지원</p>
+        <h2 style="margin: 8px 0;">로또 6/45</h2>
+        <p style="margin: 16px 0 8px; color: var(--text);">한국 로또 6/45 분석 기능은 현재 제작 중입니다.</p>
+        <p style="margin: 0 0 24px; color: var(--muted);">이 섹션은 동행복권 공식 로또 6/45 형식을 기준으로 구성될 예정입니다.</p>
+        
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: left; max-width: 440px; margin: 0 auto;">
+          <h3 style="margin: 0 0 12px; font-size: 15px;">추가 예정 기능</h3>
+          <ul style="margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; line-height: 1.6;">
+            <li>로또 6/45 회차별 결과 데이터 불러오기</li>
+            <li>최근 당첨번호 시각화</li>
+            <li>번호별 출현 빈도와 미출현 기간 분석</li>
+            <li>패턴 인사이트와 랜덤 번호 시뮬레이션</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script type="module" src="./js/main.js"></script>
 </body>
