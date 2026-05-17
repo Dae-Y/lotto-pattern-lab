@@ -1,10 +1,11 @@
 # Lotto Pattern Lab
 
-![Status](https://img.shields.io/badge/Status-Multi--country%20MVP-green.svg)
-![Built with](https://img.shields.io/badge/Built%20with-Vanilla%20JavaScript-yellow.svg)
-![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-blue.svg)
-![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933.svg)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-yellow.svg)
+![Built with](https://img.shields.io/badge/Built%20with-HTML%20%7C%20CSS%20%7C%20Vanilla%20JS-blue.svg)
+![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-green.svg)
+![Data Scripts](https://img.shields.io/badge/Data%20Scripts-Node.js-339933.svg)
 ![License](https://img.shields.io/badge/License-MIT-orange.svg)
+![Status](https://img.shields.io/badge/Status-MVP%20Complete-brightgreen.svg)
 
 **Lotto Pattern Lab** is a personal lottery data visualisation and pattern exploration web app.
 
@@ -15,7 +16,12 @@ It currently supports multi-country lottery analysis for:
 
 The project is built as a static GitHub Pages app using vanilla JavaScript modules. It focuses on historical draw visualisation, descriptive statistics, pattern insights, and random draw simulation.
 
-> This project is for data visualisation, learning, and portfolio purposes only. It does **not** predict lottery results, improve winning odds, or provide gambling advice.
+> **Important notice**  
+> This is an independent, student-made data visualisation and pattern exploration tool.  
+> It is not affiliated with, endorsed by, or operated by Lotterywest or Donghaeng Lottery.  
+> It does not sell lottery products, process payments, or guarantee outcomes.  
+> Users should verify official results, rules, prizes, and eligibility on the official websites.  
+> This project is for personal, educational, and non-commercial data visualisation purposes only.
 
 ---
 
@@ -102,7 +108,7 @@ http://localhost:5500
 
 ## Update Lottery Datasets
 
-TThis project uses static CSV/JSON files inside the `data/` folder because the GitHub Pages app serves lottery results as static assets.
+This project uses static CSV/JSON files inside the `data/` folder because the GitHub Pages app serves lottery results as static assets.
 
 The repository includes scripts for manually refreshing those data files.
 
@@ -110,13 +116,13 @@ The repository includes scripts for manually refreshing those data files.
 
 ```bash
 node scripts/fetch-lotterywest.mjs all
-````
+```
 
 This updates the Australia datasets used by:
 
-* OZ Lotto
-* Powerball
-* Set for Life
+- OZ Lotto
+- Powerball
+- Set for Life
 
 ### Update Korea Lotto 6/45 data
 
@@ -238,19 +244,23 @@ Australia lottery result data used in this project is based on publicly availabl
 
 ### Korea
 
-Korea Lotto 6/45 data used in this project is based on publicly available Lotto 6/45 draw result data. Users should always verify official results, prize details, rules, and eligibility requirements through the official Donghaeng Lottery website.
+Korea Lotto 6/45 data used in this project is based on publicly available Lotto 6/45 draw result data.
+
+Users should always verify official results, prize details, rules, and eligibility requirements through the official Donghaeng Lottery website.
 
 ---
 
 ## Disclaimer
 
-This project is an independent, fan-made data visualisation and pattern exploration tool.
+This project is an independent, student-made data visualisation and pattern exploration tool.
 
-It is **not** affiliated with, endorsed by, sponsored by, or officially operated by Lotterywest, Donghaeng Lottery, or any lottery operator/government body.
+It is not affiliated with, endorsed by, sponsored by, or officially operated by Lotterywest, Donghaeng Lottery, or any lottery operator/government body.
+
+This project does not sell lottery products, process payments, facilitate lottery purchases, or provide gambling services.
 
 Lottery numbers are random by nature. Any analysis, chart, statistic, pattern insight, or generated number suggestion shown by this project is for reference, learning, and entertainment purposes only.
 
-This project does **not** guarantee winnings, does **not** improve lottery odds, and should not be used as financial, gambling, legal, or investment advice.
+This project does not guarantee winnings, does not improve lottery odds, and should not be used as financial, gambling, legal, or investment advice.
 
 The creator is not legally responsible for any loss, decision, transaction, gambling activity, or misunderstanding that may occur from using this website or its generated results.
 
@@ -263,7 +273,5 @@ All lottery names, game names, result data, and related materials belong to thei
 **Source code:** MIT License.
 
 **Lottery datasets:** Subject to the terms, copyright, and usage policies of the relevant data owners and lottery operators. The included data is used for personal, educational, non-commercial, and portfolio demonstration purposes.
-
----
 
 © 2026 Daehwan Yeo. All rights reserved.
