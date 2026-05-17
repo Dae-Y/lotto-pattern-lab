@@ -102,15 +102,21 @@ http://localhost:5500
 
 ## Update Lottery Datasets
 
-The repository includes scripts for manually refreshing the static data files used by the GitHub Pages app.
+TThis project uses static CSV/JSON files inside the `data/` folder because the GitHub Pages app serves lottery results as static assets.
+
+The repository includes scripts for manually refreshing those data files.
 
 ### Update Australia / Lotterywest data
 
 ```bash
 node scripts/fetch-lotterywest.mjs all
-```
+````
 
-This updates the Australia datasets used by OZ Lotto, Powerball, and Set for Life.
+This updates the Australia datasets used by:
+
+* OZ Lotto
+* Powerball
+* Set for Life
 
 ### Update Korea Lotto 6/45 data
 
@@ -120,19 +126,38 @@ node scripts/fetch-korea-lotto.mjs mirror
 
 This updates the Korea Lotto 6/45 CSV and JSON files used by the Korean analysis mode.
 
-### Typical update workflow
+### Typical data update workflow
+
+When only refreshing lottery result data:
 
 ```bash
+cd ~/projects/lotto-pattern-lab
+
 node scripts/fetch-lotterywest.mjs all
 node scripts/fetch-korea-lotto.mjs mirror
 
 git status
-git add data/*.csv data/*.json scripts/*.mjs .gitignore
+git add data/*.csv data/*.json
 git commit -m "Update lottery result datasets"
 git push
 ```
 
-The app intentionally tracks the generated CSV/JSON files because GitHub Pages serves them as static assets.
+If the update scripts or `.gitignore` were also changed, include them in the commit:
+
+```bash
+git add data/*.csv data/*.json scripts/*.mjs .gitignore
+git commit -m "Update lottery result datasets and scripts"
+git push
+```
+
+You can quickly check whether the latest results were written correctly with:
+
+```bash
+head -3 data/5132-results.csv
+head -3 data/korea-lotto-645.csv
+```
+
+The generated CSV/JSON files are intentionally tracked in Git because GitHub Pages needs to serve them directly from the repository.
 
 ---
 
