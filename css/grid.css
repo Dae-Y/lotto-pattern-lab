@@ -11,31 +11,38 @@
   gap: 10px;
 }
 
-.recent-count-label {
+.draw-count-control {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
 }
 
-.recent-count-label input {
-  width: 72px;
-  padding: 6px 8px;
+.draw-count-select,
+.draw-count-custom-input {
+  min-height: 34px;
   border: 1px solid var(--border);
   border-radius: 10px;
+  padding: 0 10px;
   font: inherit;
   font-size: 14px;
   font-weight: 800;
-  text-align: center;
   color: var(--text);
-  background: #f8fafc;
+  background: #ffffff;
 }
 
-.recent-count-label input:focus {
+.draw-count-select:focus,
+.draw-count-custom-input:focus {
   outline: 2px solid var(--primary);
   outline-offset: -1px;
+}
+
+.draw-count-custom-input {
+  width: 96px;
+  text-align: center;
 }
 
 .view-toggle {

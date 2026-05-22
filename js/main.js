@@ -19,6 +19,7 @@ import { renderPatternInsights } from "./renderers/patternInsightsRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
+const RECENT_DRAW_PRESETS = [10, 30, 50, 100];
 const PREF_KEY = "lottoPatternLab.preferences";
 
 const state = {
@@ -44,7 +45,8 @@ const elements = {
   status: document.querySelector("#status"),
   compactMeta: document.querySelector("#compactMeta"),
   recentGrid: document.querySelector("#recentGrid"),
-  recentDrawCount: document.querySelector("#recentDrawCount"),
+  recentDrawPreset: document.querySelector("#recentDrawPreset"),
+  recentDrawCustomInput: document.querySelector("#recentDrawCustomInput"),
   tableViewBtn: document.querySelector("#tableViewBtn"),
   compactViewBtn: document.querySelector("#compactViewBtn"),
   stats: document.querySelector("#stats"),
@@ -71,6 +73,7 @@ async function init() {
   validateState();
 
   updateStaticUiText();
+  syncRecentDrawControls();
   
   elements.countryBtns.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
@@ -99,7 +102,13 @@ async function init() {
     clearActiveGameData();
   });
 
-  elements.recentDrawCount.addEventListener("input", handleDrawCountChange);
+  if (elements.recentDrawPreset) {
+    elements.recentDrawPreset.addEventListener("change", handleRecentDrawPresetChange);
+  }
+
+  if (elements.recentDrawCustomInput) {
+    elements.recentDrawCustomInput.addEventListener("input", handleRecentDrawCustomInput);
+  }
 
   elements.tableViewBtn.addEventListener("click", () => {
     setViewMode("table");
@@ -118,7 +127,12 @@ function loadPreferences() {
     
     if (pref.activeCountry) state.activeCountry = pref.activeCountry;
     if (pref.activeGameId) state.activeGameId = pref.activeGameId;
-    if (pref.recentDrawLimit) state.recentDrawLimit = pref.recentDrawLimit;
+    if (pref.recentDrawLimit !== undefined) {
+      const parsedLimit = Number(pref.recentDrawLimit);
+      if (Number.isInteger(parsedLimit) && parsedLimit > 0) {
+        state.recentDrawLimit = parsedLimit;
+      }
+    }
     if (pref.recentViewMode) state.recentViewMode = pref.recentViewMode;
   } catch (e) {
     console.error("Failed to load preferences", e);
@@ -250,11 +264,77 @@ function updateStaticUiText() {
     if (elements.disclaimer4) elements.disclaimer4.textContent = copy.footer.disclaimer4;
     if (elements.disclaimer5) elements.disclaimer5.textContent = copy.footer.disclaimer5;
   }
+
+  updateRecentDrawPresetLabels();
+  syncRecentDrawControls();
 }
 
-function handleDrawCountChange() {
-  const parsed = parseInt(elements.recentDrawCount.value, 10);
-  state.recentDrawLimit = parsed > 0 ? parsed : 1;
+function updateRecentDrawPresetLabels() {
+  if (!elements.recentDrawPreset) {
+    return;
+  }
+
+  const copy = getActiveCopy();
+  const customOption = elements.recentDrawPreset.querySelector('option[value="custom"]');
+
+  if (customOption) {
+    customOption.textContent = copy.recent?.drawCountOptions?.custom ?? "Custom";
+  }
+}
+
+function syncRecentDrawControls() {
+  if (!elements.recentDrawPreset || !elements.recentDrawCustomInput) {
+    return;
+  }
+
+  if (RECENT_DRAW_PRESETS.includes(state.recentDrawLimit)) {
+    elements.recentDrawPreset.value = String(state.recentDrawLimit);
+    elements.recentDrawCustomInput.hidden = true;
+  } else {
+    elements.recentDrawPreset.value = "custom";
+    elements.recentDrawCustomInput.hidden = false;
+    elements.recentDrawCustomInput.value = String(state.recentDrawLimit);
+  }
+}
+
+function handleRecentDrawPresetChange() {
+  if (!elements.recentDrawPreset || !elements.recentDrawCustomInput) {
+    return;
+  }
+
+  const value = elements.recentDrawPreset.value;
+
+  if (value === "custom") {
+    elements.recentDrawCustomInput.hidden = false;
+
+    const parsed = parseInt(elements.recentDrawCustomInput.value, 10);
+    state.recentDrawLimit = Number.isInteger(parsed) && parsed > 0 ? parsed : 10;
+
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      elements.recentDrawCustomInput.value = String(state.recentDrawLimit);
+    }
+  } else {
+    elements.recentDrawCustomInput.hidden = true;
+    state.recentDrawLimit = Number(value);
+  }
+
+  savePreferences();
+  renderRecent();
+}
+
+function handleRecentDrawCustomInput() {
+  if (!elements.recentDrawCustomInput) {
+    return;
+  }
+
+  const parsed = parseInt(elements.recentDrawCustomInput.value, 10);
+
+  if (Number.isInteger(parsed) && parsed > 0) {
+    state.recentDrawLimit = parsed;
+  } else {
+    state.recentDrawLimit = 10;
+  }
+
   savePreferences();
   renderRecent();
 }

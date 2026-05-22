@@ -17,6 +17,9 @@ export const koKR = {
     drawCount: "표시 회차 수",
     tableView: "표 보기",
     compactView: "간단히 보기",
+    drawCountOptions: {
+      custom: "직접 입력",
+    },
     legendMain: "W = 당첨번호",
     legendSecondary: "B = 보너스번호",
     draw: "회차",

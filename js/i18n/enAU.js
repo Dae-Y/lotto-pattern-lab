@@ -17,6 +17,9 @@ export const enAU = {
     drawCount: "Draw count",
     tableView: "Table View",
     compactView: "Compact View",
+    drawCountOptions: {
+      custom: "Custom",
+    },
     legendMain: "W = Winning",
     legendSecondary: "S = Supplementary / P = Powerball",
     draw: "Draw",

@@ -77,9 +77,26 @@
           </div>
 
           <div class="recent-controls">
-            <label class="recent-count-label">
+            <label class="draw-count-control">
               <span id="recentCountText">Draw count</span>
-              <input id="recentDrawCount" type="number" min="1" step="1" value="10" />
+
+              <select id="recentDrawPreset" class="draw-count-select">
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="custom">Custom</option>
+              </select>
+
+              <input
+                id="recentDrawCustomInput"
+                class="draw-count-custom-input"
+                type="number"
+                min="1"
+                step="1"
+                value="10"
+                hidden
+              />
             </label>
 
             <div class="view-toggle" role="group" aria-label="Recent draw view mode">
