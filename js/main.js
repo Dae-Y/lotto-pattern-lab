@@ -16,6 +16,7 @@ import { renderTabs } from "./renderers/tabsRenderer.js";
 import { renderRecentResults } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
 import { renderPatternInsights } from "./renderers/patternInsightsRenderer.js";
+import { renderUserNumbersAnalyzer } from "./renderers/userNumbersRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
@@ -51,6 +52,8 @@ const elements = {
   compactViewBtn: document.querySelector("#compactViewBtn"),
   stats: document.querySelector("#stats"),
   patternInsights: document.querySelector("#patternInsights"),
+  userNumbersAnalyzer: document.querySelector("#userNumbersAnalyzer"),
+  userNumbersEyebrow: document.querySelector("#userNumbersEyebrow"),
   generator: document.querySelector("#generator"),
 
   recentEyebrow: document.querySelector("#recentEyebrow"),
@@ -257,6 +260,10 @@ function updateStaticUiText() {
   if (elements.quickAnalysisEyebrow) elements.quickAnalysisEyebrow.textContent = copy.quickAnalysis.eyebrow;
   if (elements.quickAnalysisTitle) elements.quickAnalysisTitle.textContent = copy.quickAnalysis.title;
 
+  if (elements.userNumbersEyebrow) {
+    elements.userNumbersEyebrow.textContent = copy.userNumbers?.eyebrow ?? "";
+  }
+
   if (copy.footer) {
     if (elements.disclaimer1) elements.disclaimer1.textContent = copy.footer.disclaimer1;
     if (elements.disclaimer2) elements.disclaimer2.textContent = copy.footer.disclaimer2;
@@ -400,6 +407,20 @@ function renderAll() {
       elements.patternInsights.innerHTML = `
         <div class="empty-state">
           Pattern Insights could not be rendered.
+        </div>
+      `;
+    }
+  }
+
+  try {
+    renderUserNumbersAnalyzer(elements.userNumbersAnalyzer, draws, config, copy);
+  } catch (error) {
+    console.error("My Numbers Analyzer failed:", error);
+
+    if (elements.userNumbersAnalyzer) {
+      elements.userNumbersAnalyzer.innerHTML = `
+        <div class="empty-state">
+          My Numbers Analyzer could not be rendered.
         </div>
       `;
     }
