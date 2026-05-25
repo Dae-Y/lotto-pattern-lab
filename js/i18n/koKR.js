@@ -120,6 +120,10 @@ export const koKR = {
     validationDuplicate: "중복 번호는 입력할 수 없습니다.",
     validationSecondary: "올바른 보조 번호를 입력해 주세요.",
     noData: "아직 과거 데이터가 불러와지지 않았습니다.",
+    chartRecentSumsTitle: "최근 5회 합계 vs 내 합계",
+    chartFreqTitle: "선택 번호별 과거 출현 빈도",
+    mySumLabel: "내 합계",
+    timesLabel: "회",
     note:
       "이 분석은 입력한 번호 조합의 통계적 특징을 설명하는 기능입니다. 당첨 결과를 예측하거나 당첨 확률을 높여주지 않습니다.",
   },

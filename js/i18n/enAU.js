@@ -93,7 +93,7 @@ export const enAU = {
   },
   userNumbers: {
     eyebrow: "User numbers",
-    title: "My Numbers Analyzer",
+    title: "My Numbers Analyser",
     description:
       "Enter your own numbers to see their statistical profile against the selected game’s historical draw data.",
     mainInputLabel: "Main numbers",
@@ -120,6 +120,10 @@ export const enAU = {
     validationDuplicate: "Duplicate numbers are not allowed.",
     validationSecondary: "Please enter a valid secondary number.",
     noData: "Historical data has not been loaded yet.",
+    chartRecentSumsTitle: "Recent 5 Draws vs My Sum",
+    chartFreqTitle: "Selected Number Frequency",
+    mySumLabel: "My sum",
+    timesLabel: "times",
     note:
       "This analysis describes the selected numbers only. It does not predict results or improve winning odds.",
   },

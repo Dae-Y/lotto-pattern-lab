@@ -174,9 +174,127 @@
   line-height: 1.5;
 }
 
+/* Visual Charts Layout */
+.user-numbers-charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.user-chart-box {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fdfdfd;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-chart-box h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.user-chart-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* SVG Line Chart styling */
+.user-chart-dot {
+  transition: r 0.2s ease, stroke-width 0.2s ease;
+}
+
+.user-chart-dot:hover {
+  r: 6;
+  stroke-width: 3;
+  cursor: pointer;
+}
+
+.user-chart-value {
+  pointer-events: none;
+}
+
+/* Frequency Bars styling */
+.user-freq-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 6px 0 8px;
+  letter-spacing: 0.05em;
+}
+
+.user-freq-section-title.secondary {
+  margin-top: 12px;
+}
+
+.user-freq-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.user-frequency-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-number-ball.mini {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-frequency-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.user-frequency-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fce043 0%, #fb7414 100%);
+  width: 0;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-frequency-bar-fill.secondary {
+  background: linear-gradient(90deg, #70d6ff 0%, #004baf 100%);
+}
+
+.user-frequency-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 42px;
+  text-align: right;
+}
+
 @media (max-width: 900px) {
   .user-numbers-metrics {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .user-numbers-charts {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 }
 
@@ -185,3 +303,4 @@
     grid-template-columns: 1fr;
   }
 }
+

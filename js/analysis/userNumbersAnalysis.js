@@ -6,6 +6,7 @@ import {
   countRepeatsFromPrevious,
   average
 } from "../utils/numberUtils.js";
+import { getFrequencyMap } from "./frequency.js";
 
 /**
  * Analyzes the user's selected numbers against the active game configuration and historical draws.
@@ -37,6 +38,10 @@ export function analyzeUserNumbers({ mainNumbers, secondaryNumbers = [], draws =
   let comparisonSum = null;
   let comparisonSpread = null;
 
+  let recentDrawSums = [];
+  let mainFrequencies = [];
+  let secondaryFrequencies = [];
+
   if (draws && draws.length > 0) {
     const historicalSums = draws.map(d => calcSum(d.mainNumbers));
     const historicalSpreads = draws.map(d => getSpread(d.mainNumbers));
@@ -48,6 +53,31 @@ export function analyzeUserNumbers({ mainNumbers, secondaryNumbers = [], draws =
 
     comparisonSum = getComparison(sumVal, averageSum);
     comparisonSpread = getComparison(spreadVal, averageSpread);
+
+    // Extract recent 5 draws (chronological order: oldest first)
+    const last5 = draws.slice(0, 5);
+    recentDrawSums = [...last5].reverse().map(d => ({
+      drawNumber: d.drawNumber,
+      sum: calcSum(d.mainNumbers)
+    }));
+
+    // Historical frequency of each entered number
+    const mainFreqMap = getFrequencyMap(draws, config, "main");
+    mainFrequencies = sortedMain.map(num => ({
+      number: num,
+      count: mainFreqMap.get(num) ?? 0
+    }));
+
+    if (config.secondary) {
+      const secFreqMap = getFrequencyMap(draws, config, "secondary");
+      secondaryFrequencies = sortedSecondary.map(num => ({
+        number: num,
+        count: secFreqMap.get(num) ?? 0
+      }));
+    }
+  } else {
+    mainFrequencies = sortedMain.map(num => ({ number: num, count: 0 }));
+    secondaryFrequencies = sortedSecondary.map(num => ({ number: num, count: 0 }));
   }
 
   return {
@@ -59,6 +89,9 @@ export function analyzeUserNumbers({ mainNumbers, secondaryNumbers = [], draws =
     spread: spreadVal,
     consecutivePairs: consecutivePairsVal,
     repeatWithLatest: repeatWithLatestVal,
+    recentDrawSums,
+    mainFrequencies,
+    secondaryFrequencies,
     historical: {
       averageSum: averageSum !== null ? Number(averageSum.toFixed(2)) : null,
       averageSpread: averageSpread !== null ? Number(averageSpread.toFixed(2)) : null,
