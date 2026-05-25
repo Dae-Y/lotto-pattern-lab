@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,10 +14,12 @@
   <link rel="stylesheet" href="./css/grid.css" />
   <link rel="stylesheet" href="./css/stats.css" />
   <link rel="stylesheet" href="./css/insights.css" />
+  <link rel="stylesheet" href="./css/userNumbers.css" />
   <link rel="stylesheet" href="./css/generator.css" />
   <link rel="stylesheet" href="./css/footer.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
 </head>
+
 <body>
   <header class="app-header">
     <div class="app-header-inner">
@@ -42,119 +45,123 @@
   </header>
 
 
-    <main class="app-shell">
-      <section class="panel">
-        <div class="top-panel-header">
-          <div class="tabs" id="tabs"></div>
-          <div class="compact-meta" id="compactMeta"></div>
+  <main class="app-shell">
+    <section class="panel">
+      <div class="top-panel-header">
+        <div class="tabs" id="tabs"></div>
+        <div class="compact-meta" id="compactMeta"></div>
+      </div>
+
+      <div class="controls">
+        <button id="loadSampleBtn" class="primary-btn">
+          Load CSV from data folder
+        </button>
+
+        <label class="file-label">
+          <span id="uploadCsvText">Upload CSV</span>
+          <input id="csvInput" type="file" accept=".csv,text/csv" />
+        </label>
+
+        <button id="clearBtn" class="secondary-btn">
+          Clear
+        </button>
+      </div>
+
+      <p id="status" class="status-text">
+        Select a game tab, then load a CSV file.
+      </p>
+    </section>
+
+    <section class="panel wide-panel">
+      <div class="section-heading recent-heading">
+        <div>
+          <p class="eyebrow" id="recentEyebrow">Recent results</p>
+          <h2 id="recentTitle">Recent Draws</h2>
         </div>
 
-        <div class="controls">
-          <button id="loadSampleBtn" class="primary-btn">
-            Load CSV from data folder
-          </button>
+        <div class="recent-controls">
+          <label class="draw-count-control">
+            <span id="recentCountText">Draw count</span>
 
-          <label class="file-label">
-            <span id="uploadCsvText">Upload CSV</span>
-            <input id="csvInput" type="file" accept=".csv,text/csv" />
+            <select id="recentDrawPreset" class="draw-count-select">
+              <option value="10">10</option>
+              <option value="30">30</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <input id="recentDrawCustomInput" class="draw-count-custom-input" type="number" min="1" step="1" value="10"
+              hidden />
           </label>
 
-          <button id="clearBtn" class="secondary-btn">
-            Clear
-          </button>
-        </div>
-
-        <p id="status" class="status-text">
-          Select a game tab, then load a CSV file.
-        </p>
-      </section>
-
-      <section class="panel wide-panel">
-        <div class="section-heading recent-heading">
-          <div>
-            <p class="eyebrow" id="recentEyebrow">Recent results</p>
-            <h2 id="recentTitle">Recent Draws</h2>
+          <div class="view-toggle" role="group" aria-label="Recent draw view mode">
+            <button id="tableViewBtn" class="view-toggle-btn active" type="button">
+              Table View
+            </button>
+            <button id="compactViewBtn" class="view-toggle-btn" type="button">
+              Compact View
+            </button>
           </div>
-
-          <div class="recent-controls">
-            <label class="draw-count-control">
-              <span id="recentCountText">Draw count</span>
-
-              <select id="recentDrawPreset" class="draw-count-select">
-                <option value="10">10</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="custom">Custom</option>
-              </select>
-
-              <input
-                id="recentDrawCustomInput"
-                class="draw-count-custom-input"
-                type="number"
-                min="1"
-                step="1"
-                value="10"
-                hidden
-              />
-            </label>
-
-            <div class="view-toggle" role="group" aria-label="Recent draw view mode">
-              <button id="tableViewBtn" class="view-toggle-btn active" type="button">
-                Table View
-              </button>
-              <button id="compactViewBtn" class="view-toggle-btn" type="button">
-                Compact View
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="recentGrid"></div>
-      </section>
-
-      <section class="panel">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow" id="quickAnalysisEyebrow">Quick analysis</p>
-            <h2 id="quickAnalysisTitle">Quick Analysis</h2>
-          </div>
-        </div>
-
-        <div id="stats"></div>
-      </section>
-
-      <section class="panel" id="patternInsightsPanel">
-        <div id="patternInsights"></div>
-      </section>
-
-      <section class="panel" id="generatorPanel">
-        <div id="generator"></div>
-      </section>
-    </main>
-
-    <footer class="app-footer" id="appFooter">
-      <div class="disclaimer-card">
-        <div class="disclaimer-header">
-          <span class="disclaimer-icon">※</span>
-          <h2 id="disclaimerTitle">Disclaimer</h2>
-        </div>
-
-        <div class="disclaimer-body">
-          <p id="disclaimer1">Lottery results data used in this project is based on publicly available Lotterywest CSV result files.</p>
-          <p id="disclaimer2">This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.</p>
-          <p id="disclaimer3">Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
-          <p id="disclaimer4">Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.</p>
-          <p id="disclaimer5">Lotterywest names, game names, data, and related materials belong to their respective owners.</p>
-        </div>
-
-        <div class="copyright">
-          © 2026 Daehwan Yeo. All rights reserved.
         </div>
       </div>
-    </footer>
+
+      <div id="recentGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" id="quickAnalysisEyebrow">Quick analysis</p>
+          <h2 id="quickAnalysisTitle">Quick Analysis</h2>
+        </div>
+      </div>
+
+      <div id="stats"></div>
+    </section>
+
+    <section class="panel" id="patternInsightsPanel">
+      <div id="patternInsights"></div>
+    </section>
+
+    <section class="panel user-numbers-panel">
+      <p class="eyebrow" id="userNumbersEyebrow">User numbers</p>
+      <div id="userNumbersAnalyser"></div>
+    </section>
+
+    <section class="panel" id="generatorPanel">
+      <div id="generator"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer" id="appFooter">
+    <div class="disclaimer-card">
+      <div class="disclaimer-header">
+        <span class="disclaimer-icon">※</span>
+        <h2 id="disclaimerTitle">Disclaimer</h2>
+      </div>
+
+      <div class="disclaimer-body">
+        <p id="disclaimer1">Lottery results data used in this project is based on publicly available Lotterywest CSV
+          result files.</p>
+        <p id="disclaimer2">This website is an independent, fan-made data visualisation and pattern exploration tool. It
+          is not affiliated with, endorsed by, or operated by Lotterywest.</p>
+        <p id="disclaimer3">Lottery numbers are random by nature. Any analysis, statistics, or generated number
+          suggestions are for reference and entertainment purposes only and do not guarantee future results.</p>
+        <p id="disclaimer4">Users should check the official Lotterywest website for final and authoritative results,
+          game rules, prize information, and eligibility requirements.</p>
+        <p id="disclaimer5">Lotterywest names, game names, data, and related materials belong to their respective
+          owners.</p>
+      </div>
+
+      <div class="copyright">
+        © 2026 Daehwan Yeo. All rights reserved.
+      </div>
+    </div>
+  </footer>
 
 
   <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>

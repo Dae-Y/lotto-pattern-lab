@@ -16,6 +16,7 @@ import { renderTabs } from "./renderers/tabsRenderer.js";
 import { renderRecentResults } from "./renderers/gridRenderer.js";
 import { renderStats } from "./renderers/statsRenderer.js";
 import { renderPatternInsights } from "./renderers/patternInsightsRenderer.js";
+import { renderUserNumbersAnalyser } from "./renderers/userNumbersRenderer.js";
 import { renderGenerator } from "./renderers/generatorRenderer.js";
 import { formatDateLong } from "./utils/dateUtils.js";
 
@@ -36,7 +37,7 @@ const elements = {
   headerTitle: document.querySelector("#headerTitle"),
   headerSubtitle: document.querySelector("#headerSubtitle"),
   countryBtns: document.querySelectorAll(".country-btn"),
-  
+
   tabs: document.querySelector("#tabs"),
   csvInput: document.querySelector("#csvInput"),
   loadSampleBtn: document.querySelector("#loadSampleBtn"),
@@ -51,6 +52,8 @@ const elements = {
   compactViewBtn: document.querySelector("#compactViewBtn"),
   stats: document.querySelector("#stats"),
   patternInsights: document.querySelector("#patternInsights"),
+  userNumbersAnalyser: document.querySelector("#userNumbersAnalyser"),
+  userNumbersEyebrow: document.querySelector("#userNumbersEyebrow"),
   generator: document.querySelector("#generator"),
 
   recentEyebrow: document.querySelector("#recentEyebrow"),
@@ -74,7 +77,7 @@ async function init() {
 
   updateStaticUiText();
   syncRecentDrawControls();
-  
+
   elements.countryBtns.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
   });
@@ -124,7 +127,7 @@ function loadPreferences() {
     const raw = localStorage.getItem(PREF_KEY);
     if (!raw) return;
     const pref = JSON.parse(raw);
-    
+
     if (pref.activeCountry) state.activeCountry = pref.activeCountry;
     if (pref.activeGameId) state.activeGameId = pref.activeGameId;
     if (pref.recentDrawLimit !== undefined) {
@@ -257,6 +260,10 @@ function updateStaticUiText() {
   if (elements.quickAnalysisEyebrow) elements.quickAnalysisEyebrow.textContent = copy.quickAnalysis.eyebrow;
   if (elements.quickAnalysisTitle) elements.quickAnalysisTitle.textContent = copy.quickAnalysis.title;
 
+  if (elements.userNumbersEyebrow) {
+    elements.userNumbersEyebrow.textContent = copy.userNumbers?.eyebrow ?? "";
+  }
+
   if (copy.footer) {
     if (elements.disclaimer1) elements.disclaimer1.textContent = copy.footer.disclaimer1;
     if (elements.disclaimer2) elements.disclaimer2.textContent = copy.footer.disclaimer2;
@@ -364,7 +371,7 @@ function renderRecent() {
 
 function renderAll() {
   const visibleGames = getVisibleGames();
-  
+
   if (visibleGames.length === 0) {
     console.error("No visible games for country:", state.activeCountry);
     state.activeCountry = "australia";
@@ -395,11 +402,25 @@ function renderAll() {
     renderPatternInsights(elements.patternInsights, draws, config, copy);
   } catch (error) {
     console.error("Pattern Insights failed:", error);
-  
+
     if (elements.patternInsights) {
       elements.patternInsights.innerHTML = `
         <div class="empty-state">
           Pattern Insights could not be rendered.
+        </div>
+      `;
+    }
+  }
+
+  try {
+    renderUserNumbersAnalyser(elements.userNumbersAnalyser, draws, config, copy);
+  } catch (error) {
+    console.error("My Numbers Analyser failed:", error);
+
+    if (elements.userNumbersAnalyser) {
+      elements.userNumbersAnalyser.innerHTML = `
+        <div class="empty-state">
+          My Numbers Analyser could not be rendered.
         </div>
       `;
     }
@@ -426,7 +447,7 @@ async function loadSampleCsvForActiveGame({ force = false } = {}) {
   const path = `./data/${config.fileName}`;
   const cacheBustedPath = `${path}?v=${Date.now()}`;
   const copy = getActiveCopy();
-  
+
   // Try to use a loading message from copy or fallback
   const isKorean = state.activeCountry === "korea";
   const loadingMsg = isKorean ? `${config.name} 데이터를 불러오는 중...` : `Loading ${config.name} data...`;
@@ -488,7 +509,7 @@ function handleCsvUpload(event) {
       if (detectedConfig && detectedConfig.country !== state.activeCountry) {
         state.activeCountry = detectedConfig.country;
         savePreferences();
-        
+
         elements.countryBtns.forEach(btn => {
           btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
         });
@@ -524,7 +545,7 @@ function loadCsvText(csvText, config, sourceLabel) {
     const msg = isKorean
       ? `${config.name}: ${draws.length.toLocaleString()}개 회차 데이터를 불러왔습니다.`
       : `${config.name}: loaded ${draws.length.toLocaleString()} current-format draws from ${sourceLabel.toLowerCase()}.`;
-    
+
     setStatus(msg);
 
     renderAll();

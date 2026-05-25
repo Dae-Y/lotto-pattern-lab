@@ -1,0 +1,306 @@
+.user-numbers-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 16px;
+}
+
+.user-numbers-header h2 {
+  margin: 4px 0 8px;
+  color: var(--text);
+}
+
+.user-numbers-description {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.user-numbers-form {
+  display: grid;
+  gap: 12px;
+}
+
+.user-numbers-field {
+  display: grid;
+  gap: 6px;
+}
+
+.user-numbers-field label {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.user-numbers-input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 12px;
+  font: inherit;
+  background: #ffffff;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.user-numbers-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.user-numbers-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.user-numbers-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.user-numbers-result {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.user-numbers-result-card h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.user-number-balls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.user-number-ball {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 14px;
+  background: radial-gradient(circle at 35% 30%, #fffdf0 0%, #fff35c 45%, #e0b800 100%);
+  color: #272000;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.7),
+    0 2px 8px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.user-number-ball.secondary {
+  background: radial-gradient(circle at 35% 30%, #eef8ff 0%, #70d6ff 45%, #1f6feb 100%);
+  color: #06203f;
+}
+
+.user-numbers-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.user-number-metric {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.user-number-metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.user-number-metric strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.user-numbers-comparison {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fbfcff;
+  padding: 12px;
+}
+
+.user-numbers-comparison h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.user-numbers-comparison p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.user-avg-span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: normal;
+  margin-left: 4px;
+}
+
+.user-numbers-no-data {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 13px;
+  margin: 0;
+}
+
+.user-numbers-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Visual Charts Layout */
+.user-numbers-charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.user-chart-box {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fdfdfd;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-chart-box h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.user-chart-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* SVG Line Chart styling */
+.user-chart-dot {
+  transition: r 0.2s ease, stroke-width 0.2s ease;
+}
+
+.user-chart-dot:hover {
+  r: 6;
+  stroke-width: 3;
+  cursor: pointer;
+}
+
+.user-chart-value {
+  pointer-events: none;
+}
+
+/* Frequency Bars styling */
+.user-freq-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 6px 0 8px;
+  letter-spacing: 0.05em;
+}
+
+.user-freq-section-title.secondary {
+  margin-top: 12px;
+}
+
+.user-freq-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.user-frequency-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-number-ball.mini {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-frequency-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.user-frequency-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fce043 0%, #fb7414 100%);
+  width: 0;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-frequency-bar-fill.secondary {
+  background: linear-gradient(90deg, #70d6ff 0%, #004baf 100%);
+}
+
+.user-frequency-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 42px;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .user-numbers-metrics {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .user-numbers-charts {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 520px) {
+  .user-numbers-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
