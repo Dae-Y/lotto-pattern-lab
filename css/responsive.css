@@ -21,6 +21,10 @@
 }
 
 @media (max-width: 800px) {
+  .app-header {
+    min-height: 282px;
+  }
+
   .app-header-inner {
     flex-direction: column;
     align-items: stretch;
