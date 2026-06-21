@@ -4,6 +4,7 @@
   padding: 36px 24px 24px;
   background: linear-gradient(135deg, #182033, #283b63);
   color: white;
+  min-height: 170px;
 }
 
 .app-header h1 {
@@ -30,6 +31,7 @@
   gap: 6px;
   margin-left: auto;
   flex-shrink: 0;
+  min-height: 74px;
 }
 
 .country-switcher {

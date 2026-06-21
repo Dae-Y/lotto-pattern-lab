@@ -1,46 +1,67 @@
 # Lotto Pattern Lab
 
-![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-yellow.svg)
-![Built with](https://img.shields.io/badge/Built%20with-HTML%20%7C%20CSS%20%7C%20Vanilla%20JS-blue.svg)
-![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-green.svg)
-![Data Scripts](https://img.shields.io/badge/Data%20Scripts-Node.js-339933.svg)
-![License](https://img.shields.io/badge/License-MIT-orange.svg)
-![Status](https://img.shields.io/badge/Status-MVP%20Complete-brightgreen.svg)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-yellow)
+![Static App](https://img.shields.io/badge/Built%20with-Vanilla%20JS-blue)
+![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-brightgreen)
+![Data Scripts](https://img.shields.io/badge/Data-Scripts-informational)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e5525c30-f3f6-43d2-87dd-313036c86c6a" alt="Lotto Pattern Lab screenshot" width="85%">
+</p>
+
 
 **Lotto Pattern Lab** is a personal lottery data visualisation and pattern exploration web app.
 
-It currently supports multi-country lottery analysis for:
+It currently supports multi-country and multi-operator lottery analysis for:
 
-- **Australia** — Lotterywest draw games
-- **Korea** — Lotto 6/45 / 로또 6/45
+- **Australia — WA / Lotterywest**
+  - OZ Lotto
+  - Powerball
+  - Set for Life
+- **Australia — VIC / The Lott / Tatts**
+  - TattsLotto
+- **Korea — Donghaeng Lottery**
+  - Lotto 6/45 / 로또 6/45
 
 The project is built as a static GitHub Pages app using vanilla JavaScript modules. It focuses on historical draw visualisation, descriptive statistics, pattern insights, and random draw simulation.
 
-> **Important notice**  
-> This is an independent, student-made data visualisation and pattern exploration tool.  
-> It is not affiliated with, endorsed by, or operated by Lotterywest or Donghaeng Lottery.  
-> It does not sell lottery products, process payments, or guarantee outcomes.  
-> Users should verify official results, rules, prizes, and eligibility on the official websites.  
-> This project is for personal, educational, and non-commercial data visualisation purposes only.
+---
+
+## Important Notice
+
+This is an independent, student-made data visualisation and pattern exploration tool.
+
+It is **not affiliated with, endorsed by, sponsored by, or operated by Lotterywest, The Lott, Tatts, Donghaeng Lottery, or any lottery operator/government body**.
+
+This project does not sell lottery products, process payments, facilitate lottery purchases, or guarantee outcomes. Users should always verify official results, rules, prizes, and eligibility through the relevant official lottery websites.
+
+This project is for personal, educational, non-commercial, and portfolio demonstration purposes only.
 
 ---
 
 ## Features
 
-### Multi-country mode
+### Multi-country and region/operator mode
 
 Switch between Australia and Korea from the page header.
 
-- Australia mode renders English UI and Lotterywest games.
-- Korea mode renders Korean UI and Lotto 6/45 analysis.
-- The selected country, game, recent draw count, and view mode are saved locally using `localStorage`.
+Australia mode supports region/operator switching:
+
+- **WA** — Lotterywest datasets
+- **VIC** — The Lott / Tatts datasets
+
+Korea mode renders Korean UI and Lotto 6/45 analysis.
+
+The selected country, region, game, recent draw count, and view mode are saved locally using `localStorage`.
 
 ### Recent draw visualisation
 
 - Configurable recent draw count
 - Table view for full number-grid inspection
 - Compact view with lottery-ball style results
-- Main numbers, bonus numbers, supplementary numbers, and Powerball-style numbers are displayed according to each game configuration
+- Main numbers, bonus numbers, supplementary numbers, and Powerball-style numbers displayed according to each game configuration
 
 ### Quick analysis
 
@@ -68,8 +89,9 @@ Generate random entries based on the selected game rule.
 
 Examples:
 
-- Australia Powerball: 7 main numbers + 1 Powerball
-- Korea Lotto 6/45: 6 main numbers + 1 bonus number
+- **Australia Powerball**: 7 main numbers + 1 Powerball
+- **Australia TattsLotto**: 6 main numbers
+- **Korea Lotto 6/45**: 6 main numbers + 1 bonus number
 
 Generated numbers are random and are intended only for simulation and entertainment.
 
@@ -77,12 +99,11 @@ Generated numbers are random and are intended only for simulation and entertainm
 
 ## Supported Lottery Data
 
-The app currently supports:
-
-| Country | Games |
-|---|---|
-| Australia | OZ Lotto, Powerball, Set for Life |
-| Korea | Lotto 6/45 / 로또 6/45 |
+| Country | Region / Operator | Games | Data source style |
+|---|---|---|---|
+| Australia | WA / Lotterywest | OZ Lotto, Powerball, Set for Life | Public Lotterywest result datasets |
+| Australia | VIC / The Lott / Tatts | TattsLotto | Public The Lott website data endpoints |
+| Korea | Donghaeng Lottery | Lotto 6/45 / 로또 6/45 | Public Lotto 6/45 result data |
 
 The internal data files are stored in the `data/` directory and are loaded by the app through configuration. End users do not need to know the internal dataset filenames.
 
@@ -112,17 +133,45 @@ This project uses static CSV/JSON files inside the `data/` folder because the Gi
 
 The repository includes scripts for manually refreshing those data files.
 
-### Update Australia / Lotterywest data
+### Update Australia / WA / Lotterywest data
 
 ```bash
 node scripts/fetch-lotterywest.mjs all
 ```
 
-This updates the Australia datasets used by:
+This updates the Australia WA datasets used by:
 
 - OZ Lotto
 - Powerball
 - Set for Life
+
+### Update Australia / VIC / The Lott / TattsLotto data
+
+```bash
+node scripts/fetch-thelott.mjs tattslotto
+```
+
+This updates the VIC TattsLotto dataset using the latest public The Lott result data and merges it into:
+
+```text
+data/au-vic-tattslotto.csv
+```
+
+The latest-results endpoint is limited to the most recent 10 draws, so this mode is designed for regular weekly updates.
+
+### One-time TattsLotto historical backfill
+
+The script also supports historical backfill using The Lott’s public historical date-range endpoint.
+
+Example:
+
+```bash
+node scripts/fetch-thelott.mjs tattslotto --backfill-months=120
+```
+
+This fetches TattsLotto results month-by-month and merges them into the same CSV file.
+
+A 120-month backfill was used to seed the current TattsLotto dataset with several hundred historical draws. Future GitHub Actions updates can then use the normal latest-update mode and continue growing the dataset over time.
 
 ### Update Korea Lotto 6/45 data
 
@@ -140,6 +189,7 @@ When only refreshing lottery result data:
 cd ~/projects/lotto-pattern-lab
 
 node scripts/fetch-lotterywest.mjs all
+node scripts/fetch-thelott.mjs tattslotto
 node scripts/fetch-korea-lotto.mjs mirror
 
 git status
@@ -148,10 +198,10 @@ git commit -m "Update lottery result datasets"
 git push
 ```
 
-If the update scripts or `.gitignore` were also changed, include them in the commit:
+If the update scripts or workflow files were also changed, include them in the commit:
 
 ```bash
-git add data/*.csv data/*.json scripts/*.mjs .gitignore
+git add data/*.csv data/*.json scripts/*.mjs .github/workflows/*.yml
 git commit -m "Update lottery result datasets and scripts"
 git push
 ```
@@ -160,10 +210,126 @@ You can quickly check whether the latest results were written correctly with:
 
 ```bash
 head -3 data/5132-results.csv
+head -3 data/au-vic-tattslotto.csv
 head -3 data/korea-lotto-645.csv
 ```
 
 The generated CSV/JSON files are intentionally tracked in Git because GitHub Pages needs to serve them directly from the repository.
+
+---
+
+## Automated Data Updates
+
+The repository includes a GitHub Actions workflow for scheduled dataset refreshes.
+
+```text
+.github/workflows/update-lottery-data.yml
+```
+
+The workflow runs on a weekly schedule and updates:
+
+- Lotterywest datasets
+- The Lott / TattsLotto dataset
+- Korea Lotto 6/45 dataset
+
+The action commits changed static data files back into the repository when new results are available.
+
+---
+
+## Data Source Discovery Notes
+
+This project intentionally keeps the data-fetching scripts in `scripts/` as readable examples for students, junior developers, and anyone learning how static data-driven web apps can be maintained.
+
+The scripts are not just “download helpers”; they document the process of discovering public result data sources, validating response shapes, normalising different formats, and maintaining static CSV/JSON assets for GitHub Pages.
+
+### WA / Lotterywest
+
+Lotterywest datasets are fetched using public Lotterywest result CSV endpoints.
+
+The script:
+
+```text
+scripts/fetch-lotterywest.mjs
+```
+
+updates the WA game datasets:
+
+```text
+data/5130-results.csv
+data/5132-results.csv
+data/5237-results.csv
+```
+
+### VIC / The Lott / TattsLotto
+
+The TattsLotto integration was developed by manually inspecting The Lott’s website with browser DevTools, especially the Network tab.
+
+The current script:
+
+```text
+scripts/fetch-thelott.mjs
+```
+
+uses two public The Lott website data endpoints:
+
+1. Latest results endpoint
+
+```text
+https://data.api.thelott.com/sales/vmax/web/data/lotto/latestresults
+```
+
+This endpoint returns the latest TattsLotto draw results but is limited to the most recent 10 draws.
+
+2. Historical date-range endpoint
+
+```text
+https://data.api.thelott.com/sales/vmax/web/data/lotto/results/search/daterange
+```
+
+This endpoint was manually verified on **2026-06-22** by using browser DevTools / Network inspection on The Lott TattsLotto results page.
+
+Example historical request payload:
+
+```json
+{
+  "DateStart": "2025-12-31T13:00:00Z",
+  "DateEnd": "2026-01-31T12:59:59Z",
+  "ProductFilter": ["TattsLotto"],
+  "CompanyFilter": ["Tattersalls"]
+}
+```
+
+Confirmed response fields include:
+
+- `DrawNumber`
+- `DrawDate`
+- `PrimaryNumbers`
+- `SecondaryNumbers`
+
+The script deliberately **does not** use S3/Vimeo draw video metadata as draw result data. URLs such as:
+
+```text
+https://s3-ap-southeast-2.amazonaws.com/lott-draw-videos/tattslotto/{draw}.json
+```
+
+only contain video/embed metadata and are not suitable as number result data.
+
+### Korea / Donghaeng Lotto 6/45
+
+The Korea Lotto 6/45 script:
+
+```text
+scripts/fetch-korea-lotto.mjs
+```
+
+updates:
+
+```text
+data/korea-lotto-645.csv
+data/korea-lotto-645.json
+```
+
+The Korean analysis mode uses public Lotto 6/45 result data and presents the UI in Korean.
 
 ---
 
@@ -186,18 +352,20 @@ lotto-pattern-lab/
 │   ├── insights.css
 │   ├── generator.css
 │   ├── footer.css
-│   └── responsive.css
+│   ├── responsive.css
+│   └── userNumbers.css
 │
 ├── data/
-│   ├── australia result datasets
-│   └── korea lotto 6/45 datasets
+│   ├── 5130-results.csv
+│   ├── 5132-results.csv
+│   ├── 5237-results.csv
+│   ├── au-vic-tattslotto.csv
+│   ├── korea-lotto-645.csv
+│   └── korea-lotto-645.json
 │
 ├── js/
 │   ├── main.js
 │   ├── config/
-│   │   ├── countries.js
-│   │   ├── gameConfigs.js
-│   │   └── games/
 │   ├── i18n/
 │   ├── parsers/
 │   ├── renderers/
@@ -207,11 +375,14 @@ lotto-pattern-lab/
 │
 ├── scripts/
 │   ├── fetch-lotterywest.mjs
+│   ├── fetch-thelott.mjs
 │   └── fetch-korea-lotto.mjs
 │
 └── models/
     └── README.md
 ```
+
+Local virtual environments such as `venv/` are development-only and should not be considered part of the project structure.
 
 ---
 
@@ -222,6 +393,7 @@ The app is designed around configuration-driven lottery games.
 Each game defines:
 
 - country
+- region/operator where applicable
 - locale
 - display name
 - data file
@@ -229,8 +401,9 @@ Each game defines:
 - main number range/count
 - secondary number range/count
 - display labels and markers
+- source attribution and official result links
 
-The shared renderers and analysis modules then reuse the same logic across different countries and game formats.
+The shared renderers and analysis modules then reuse the same logic across different countries, operators, and game formats.
 
 This makes it easier to add more lottery games later without duplicating the whole UI.
 
@@ -238,11 +411,19 @@ This makes it easier to add more lottery games later without duplicating the who
 
 ## Data Attribution
 
-### Australia
+### Australia — WA / Lotterywest
 
-Australia lottery result data used in this project is based on publicly available Lotterywest result data.
+Australia WA lottery result data used in this project is based on publicly available Lotterywest result data.
 
-### Korea
+Users should always verify official results, prize details, rules, and eligibility requirements through official Lotterywest sources.
+
+### Australia — VIC / The Lott / Tatts
+
+Victoria TattsLotto result data used in this project is based on publicly available The Lott website result data.
+
+Users should always verify official results, prize details, rules, and eligibility requirements through official The Lott / Tatts sources.
+
+### Korea — Donghaeng Lottery
 
 Korea Lotto 6/45 data used in this project is based on publicly available Lotto 6/45 draw result data.
 
@@ -254,7 +435,7 @@ Users should always verify official results, prize details, rules, and eligibili
 
 This project is an independent, student-made data visualisation and pattern exploration tool.
 
-It is not affiliated with, endorsed by, sponsored by, or officially operated by Lotterywest, Donghaeng Lottery, or any lottery operator/government body.
+It is not affiliated with, endorsed by, sponsored by, or officially operated by Lotterywest, The Lott, Tatts, Donghaeng Lottery, or any lottery operator/government body.
 
 This project does not sell lottery products, process payments, facilitate lottery purchases, or provide gambling services.
 
@@ -270,8 +451,8 @@ All lottery names, game names, result data, and related materials belong to thei
 
 ## License
 
-**Source code:** MIT License.
+Source code: MIT License.
 
-**Lottery datasets:** Subject to the terms, copyright, and usage policies of the relevant data owners and lottery operators. The included data is used for personal, educational, non-commercial, and portfolio demonstration purposes.
+Lottery datasets: Subject to the terms, copyright, and usage policies of the relevant data owners and lottery operators. The included data is used for personal, educational, non-commercial, and portfolio demonstration purposes.
 
 © 2026 Daehwan Yeo. All rights reserved.
