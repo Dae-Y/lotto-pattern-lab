@@ -1,18 +1,16 @@
 # Lotto Pattern Lab
 
-<!-- Replace this placeholder with your current app screenshot in GitHub README editor. -->
-<!-- Suggested position: directly under the title/badges, before the project description. -->
-<!-- Example:
-<p align="center">
-  <img src="YOUR_SCREENSHOT_URL_OR_RELATIVE_PATH" alt="Lotto Pattern Lab screenshot" width="900">
-</p>
--->
-
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-yellow)
 ![Static App](https://img.shields.io/badge/Built%20with-Vanilla%20JS-blue)
 ![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-brightgreen)
 ![Data Scripts](https://img.shields.io/badge/Data-Scripts-informational)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e5525c30-f3f6-43d2-87dd-313036c86c6a" alt="Lotto Pattern Lab screenshot" width="85%">
+</p>
+
 
 **Lotto Pattern Lab** is a personal lottery data visualisation and pattern exploration web app.
 
