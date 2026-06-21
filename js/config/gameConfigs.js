@@ -22,6 +22,7 @@ export function detectGameIdFromFileName(fileName) {
   if (lower.includes("powerball")) return "5132";
   if (lower.includes("setforlife") || lower.includes("set for life") || lower.includes("set_for_life")) return "5237";
   if (lower.includes("korea-lotto") || lower.includes("lotto-645") || lower.includes("korea_lotto_645")) return "korea_lotto_645";
+  if (lower.includes("tatts") || lower.includes("thelott")) return "au-vic-tattslotto";
 
   return null;
 }
@@ -40,6 +41,18 @@ export function detectGameIdFromCsvText(csvText, parseCsvLine) {
 
   const headers = parseCsvLine(headerLine).map((h) => h.trim());
   const headerSet = new Set(headers);
+
+  // VIC TattsLotto
+  if (
+    headerSet.has("drawNo") &&
+    headerSet.has("date") &&
+    headerSet.has("n1") &&
+    headerSet.has("s1") &&
+    headerSet.has("s2") &&
+    !headerSet.has("bonus")
+  ) {
+    return "au-vic-tattslotto";
+  }
 
   // Korea Lotto 6/45
   if (

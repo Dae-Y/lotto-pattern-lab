@@ -86,23 +86,25 @@ function renderResults(resultList, config, count, copy) {
       ballRow.appendChild(ball);
     });
 
-    // Separator label
-    const separator = document.createElement("span");
-    separator.className = "ball-separator";
-    separator.textContent = config.secondary.label;
-    ballRow.appendChild(separator);
+    // Separator label & Secondary numbers
+    if (config.secondary && !config.secondary.drawOnly) {
+      const separator = document.createElement("span");
+      separator.className = "ball-separator";
+      separator.textContent = config.secondary.label;
+      ballRow.appendChild(separator);
 
-    // Secondary numbers
-    const secondaryClass = config.secondary.sharesMainGrid
-      ? "supplementary-ball"
-      : "powerball-ball";
+      // Secondary numbers
+      const secondaryClass = config.secondary.sharesMainGrid
+        ? "supplementary-ball"
+        : "powerball-ball";
 
-    entry.secondaryNumbers.forEach((number) => {
-      const ball = document.createElement("span");
-      ball.className = `lottery-ball ${secondaryClass}`;
-      ball.textContent = number;
-      ballRow.appendChild(ball);
-    });
+      entry.secondaryNumbers.forEach((number) => {
+        const ball = document.createElement("span");
+        ball.className = `lottery-ball ${secondaryClass}`;
+        ball.textContent = number;
+        ballRow.appendChild(ball);
+      });
+    }
 
     set.appendChild(label);
     set.appendChild(ballRow);

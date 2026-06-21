@@ -2,6 +2,7 @@ export const AUSTRALIA_GAMES = [
   {
     id: "5130",
     country: "australia",
+    region: "wa",
     locale: "en-AU",
     parserType: "lotterywest",
     name: "OZ Lotto",
@@ -32,6 +33,7 @@ export const AUSTRALIA_GAMES = [
   {
     id: "5132",
     country: "australia",
+    region: "wa",
     locale: "en-AU",
     parserType: "lotterywest",
     name: "Powerball",
@@ -62,6 +64,7 @@ export const AUSTRALIA_GAMES = [
   {
     id: "5237",
     country: "australia",
+    region: "wa",
     locale: "en-AU",
     parserType: "lotterywest",
     name: "Set for Life",
@@ -82,6 +85,35 @@ export const AUSTRALIA_GAMES = [
       count: 2,
       columnPrefix: "Supplementary Number",
       sharesMainGrid: true,
+    },
+    display: {
+      mainMark: "W",
+      secondaryMark: "S",
+      secondaryClass: "supplementary-hit",
+    },
+  },
+  {
+    id: "au-vic-tattslotto",
+    country: "australia",
+    region: "vic",
+    locale: "en-AU",
+    parserType: "thelott",
+    name: "TattsLotto",
+    shortName: "TattsLotto",
+    fileName: "au-vic-tattslotto.csv",
+    sourceLabel: "The Lott / Tatts public results data",
+    officialUrl: "https://www.thelott.com/tattslotto/results",
+    main: {
+      label: "Winning",
+      range: 45,
+      count: 6,
+    },
+    secondary: {
+      label: "Supplementary",
+      range: 45,
+      count: 2,
+      sharesMainGrid: true,
+      drawOnly: true,
     },
     display: {
       mainMark: "W",

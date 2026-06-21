@@ -26,9 +26,17 @@
     align-items: stretch;
   }
 
+  .country-switcher-container {
+    align-items: flex-start;
+    margin-left: 0;
+  }
+
   .country-switcher {
     justify-content: flex-start;
-    margin-left: 0;
+  }
+
+  .region-switcher {
+    justify-content: flex-start;
   }
 
   .top-panel-header {
