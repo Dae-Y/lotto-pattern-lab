@@ -1,3 +1,67 @@
+/**
+ * The Lott / TattsLotto data fetcher
+ * ----------------------------------
+ *
+ * Last verified: 2026-06-22
+ *
+ * This script fetches Victoria TattsLotto results from The Lott's public
+ * website data endpoints and writes them to:
+ *
+ *   data/au-vic-tattslotto.csv
+ *
+ * It supports two modes:
+ *
+ * 1. Latest update mode:
+ *      node scripts/fetch-thelott.mjs tattslotto
+ *
+ *    Fetches the latest TattsLotto results from:
+ *      https://data.api.thelott.com/sales/vmax/web/data/lotto/latestresults
+ *
+ *    Note:
+ *    The latest-results endpoint is limited to the most recent 10 draws.
+ *    This mode is intended for the weekly GitHub Actions update workflow.
+ *
+ * 2. Historical backfill mode:
+ *      node scripts/fetch-thelott.mjs tattslotto --backfill-months=120
+ *
+ *    Fetches historical TattsLotto results month-by-month from the official
+ *    The Lott historical date-range endpoint:
+ *      https://data.api.thelott.com/sales/vmax/web/data/lotto/results/search/daterange
+ *
+ *    This was manually verified via browser DevTools / Network inspection
+ *    on 2026-06-22. The endpoint returns official draw data with:
+ *      - DrawNumber
+ *      - DrawDate
+ *      - PrimaryNumbers
+ *      - SecondaryNumbers
+ *
+ *    Example payload for January 2026:
+ *      {
+ *        "DateStart": "2025-12-31T13:00:00Z",
+ *        "DateEnd": "2026-01-31T12:59:59Z",
+ *        "ProductFilter": ["TattsLotto"],
+ *        "CompanyFilter": ["Tattersalls"]
+ *      }
+ *
+ * Important:
+ * - This script does not use third-party result archives.
+ * - This script does not use S3/Vimeo draw video metadata as number data.
+ * - S3 URLs such as /lott-draw-videos/tattslotto/{draw}.json only contain
+ *   video/embed metadata and should not be treated as draw result data.
+ * - Historical backfill is intended as a one-time seed operation.
+ * - Weekly automation should normally use latest update mode only.
+ *
+ * Purpose:
+ * This script is kept in the repository as part of an educational web/data
+ * visualisation project. It documents one practical approach to discovering,
+ * validating, normalising, and maintaining public lottery result datasets for
+ * a static browser-based analysis tool.
+ *
+ * Disclaimer:
+ * This project is independent and is not affiliated with, endorsed by, or
+ * operated by The Lott, Tatts, Lotterywest, or any lottery operator.
+ */
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -70,7 +134,7 @@ function normaliseDraw(raw) {
   const date = normaliseDate(
     getFirstExistingValue(raw, ["DrawDate", "drawDate", "date", "drwNoDate"], "")
   );
-  
+
   const mainNumbersRaw = getFirstExistingValue(raw, [
     "PrimaryNumbers",
     "primaryNumbers",
@@ -78,7 +142,7 @@ function normaliseDraw(raw) {
     "winningNumbers",
     "winning_numbers"
   ]);
-  
+
   const suppNumbersRaw = getFirstExistingValue(raw, [
     "SecondaryNumbers",
     "secondaryNumbers",
@@ -94,7 +158,7 @@ function normaliseDraw(raw) {
   if (Array.isArray(mainNumbersRaw)) {
     mainNumbers = mainNumbersRaw.map(Number).filter(n => Number.isFinite(n));
   }
-  
+
   let suppNumbers = [];
   if (Array.isArray(suppNumbersRaw)) {
     suppNumbers = suppNumbersRaw.map(Number).filter(n => Number.isFinite(n));
@@ -132,7 +196,7 @@ function printDebugInfo(payload, error = null) {
   console.log("=== DEBUG INFORMATION ===");
   if (payload && typeof payload === "object") {
     console.log("Top-level keys:", Object.keys(payload));
-    
+
     let rawDraws = null;
     try {
       rawDraws = extractDrawArray(payload);
@@ -140,7 +204,7 @@ function printDebugInfo(payload, error = null) {
     } catch (e) {
       console.log("Failed to locate raw draws array:", e.message);
     }
-    
+
     if (rawDraws && rawDraws.length > 0) {
       const firstDraw = rawDraws[0];
       console.log("First draw object keys:", Object.keys(firstDraw));
@@ -167,10 +231,10 @@ async function fetchLatestResults(apiProductFilter) {
   };
 
   const body = JSON.stringify(payload);
-  
+
   let response;
   let text = "";
-  
+
   console.log(`Fetching latest results for ${apiProductFilter}...`);
   try {
     response = await fetch(url, {
@@ -181,9 +245,9 @@ async function fetchLatestResults(apiProductFilter) {
       },
       body
     });
-    
+
     text = await response.text();
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${text.slice(0, 150)}`);
     }
@@ -200,7 +264,7 @@ async function fetchLatestResults(apiProductFilter) {
       },
       body
     });
-    
+
     text = await response.text();
     if (!response.ok) {
       throw new Error(`Retry HTTP ${response.status}: ${text.slice(0, 150)}`);
@@ -227,10 +291,10 @@ async function fetchHistoricalResults(dateStart, dateEnd) {
   };
 
   const body = JSON.stringify(payload);
-  
+
   let response;
   let text = "";
-  
+
   try {
     response = await fetch(url, {
       method: "POST",
@@ -240,9 +304,9 @@ async function fetchHistoricalResults(dateStart, dateEnd) {
       },
       body
     });
-    
+
     text = await response.text();
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${text.slice(0, 150)}`);
     }
@@ -258,7 +322,7 @@ async function fetchHistoricalResults(dateStart, dateEnd) {
       },
       body
     });
-    
+
     text = await response.text();
     if (!response.ok) {
       throw new Error(`Retry HTTP ${response.status}: ${text.slice(0, 150)}`);
@@ -302,12 +366,12 @@ function getMelbourneMonthUTCBounds(year, month) {
   const estDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
   const offsetHours = getMelbourneOffsetHours(estDate);
   const startUTC = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0) - offsetHours * 3600 * 1000);
-  
+
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const estEndDate = new Date(Date.UTC(year, month - 1, lastDay, 23, 59, 59));
   const endOffsetHours = getMelbourneOffsetHours(estEndDate);
   const endUTC = new Date(Date.UTC(year, month - 1, lastDay, 23, 59, 59) - endOffsetHours * 3600 * 1000);
-  
+
   return {
     DateStart: startUTC.toISOString().replace(".000Z", "Z"),
     DateEnd: endUTC.toISOString().replace(".000Z", "Z")
@@ -353,9 +417,9 @@ async function main() {
     throw new Error(`Maximum backfill limit is 120 months. Requested: ${backfillMonths}`);
   }
 
-  const nonFlagArgs = args.filter(arg => 
-    arg !== "--debug" && 
-    arg !== "--backfill" && 
+  const nonFlagArgs = args.filter(arg =>
+    arg !== "--debug" &&
+    arg !== "--backfill" &&
     !arg.startsWith("--backfill-months=")
   );
   const productArg = nonFlagArgs[0] || "tattslotto";
@@ -409,7 +473,7 @@ async function main() {
   if (backfillMonths > 0) {
     const { year: currentYear, month: currentMonth } = getCurrentMelbourneYearMonth();
     console.log(`Backfill requested: ${backfillMonths} months from ${currentYear}-${String(currentMonth).padStart(2, '0')}`);
-    
+
     // Generate list of months
     const targetMonths = [];
     let y = currentYear;
@@ -428,17 +492,17 @@ async function main() {
     for (const target of targetMonths) {
       const { DateStart, DateEnd } = getMelbourneMonthUTCBounds(target.year, target.month);
       console.log(`Fetching historical draws for ${target.year}-${String(target.month).padStart(2, '0')} (${DateStart} to ${DateEnd})...`);
-      
+
       try {
         const histData = await fetchHistoricalResults(DateStart, DateEnd);
-        
+
         if (histData && histData.Success === false) {
           throw new Error(`API returned Success: false. ErrorInfo: ${JSON.stringify(histData.ErrorInfo)}`);
         }
-        
+
         const rawDraws = extractDrawArray(histData);
         let monthDrawsFetched = 0;
-        
+
         for (const rawDraw of rawDraws) {
           try {
             const normalised = normaliseDraw(rawDraw);
@@ -448,13 +512,13 @@ async function main() {
             console.warn(`Warning: Skipped invalid draw row in ${target.year}-${String(target.month).padStart(2, '0')}: ${err.message}`);
           }
         }
-        
+
         console.log(`Fetched ${monthDrawsFetched} draw(s) for ${target.year}-${String(target.month).padStart(2, '0')}`);
       } catch (err) {
         console.warn(`Warning: Failed to fetch/parse historical data for ${target.year}-${String(target.month).padStart(2, '0')}: ${err.message}`);
         skippedFailedMonths++;
       }
-      
+
       // Delay around 200ms
       await delay(200);
     }
@@ -481,16 +545,16 @@ async function main() {
   try {
     const content = await fs.readFile(CSV_PATH, "utf8");
     const lines = content.split(/\r?\n/);
-    
+
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      
+
       const parts = line.split(",");
       if (parts.length < 10) {
         continue;
       }
-      
+
       const drawNo = Number(parts[0]);
       const date = parts[1];
       const n1 = Number(parts[2]);
@@ -501,7 +565,7 @@ async function main() {
       const n6 = Number(parts[7]);
       const s1 = Number(parts[8]);
       const s2 = Number(parts[9]);
-      
+
       if (Number.isInteger(drawNo) && drawNo > 0) {
         existingDraws.set(drawNo, { drawNo, date, n1, n2, n3, n4, n5, n6, s1, s2 });
       }
