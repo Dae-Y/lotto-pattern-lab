@@ -10,6 +10,8 @@ function printUsage() {
   console.log("  node scripts/fetch-thelott.mjs");
   console.log("  node scripts/fetch-thelott.mjs tattslotto");
   console.log("  node scripts/fetch-thelott.mjs tattslotto --debug");
+  console.log("  node scripts/fetch-thelott.mjs tattslotto --backfill");
+  console.log("  node scripts/fetch-thelott.mjs tattslotto --backfill-months=24");
   console.log("");
 }
 
@@ -215,11 +217,147 @@ async function fetchLatestResults(apiProductFilter) {
   return data;
 }
 
+async function fetchHistoricalResults(dateStart, dateEnd) {
+  const url = "https://data.api.thelott.com/sales/vmax/web/data/lotto/results/search/daterange";
+  const payload = {
+    DateStart: dateStart,
+    DateEnd: dateEnd,
+    ProductFilter: ["TattsLotto"],
+    CompanyFilter: ["Tattersalls"]
+  };
+
+  const body = JSON.stringify(payload);
+  
+  let response;
+  let text = "";
+  
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "content-type": "application/json"
+      },
+      body
+    });
+    
+    text = await response.text();
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${text.slice(0, 150)}`);
+    }
+  } catch (error) {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "origin": "https://www.thelott.com",
+        "referer": "https://www.thelott.com/",
+        "user-agent": "Mozilla/5.0"
+      },
+      body
+    });
+    
+    text = await response.text();
+    if (!response.ok) {
+      throw new Error(`Retry HTTP ${response.status}: ${text.slice(0, 150)}`);
+    }
+  }
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    throw new Error(`Failed to parse response as JSON. Body start: ${text.slice(0, 150)}`);
+  }
+
+  return data;
+}
+
+function getMelbourneOffsetHours(date) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Australia/Melbourne",
+    year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", second: "numeric",
+    hourCycle: "h23"
+  });
+  const parts = formatter.formatToParts(date);
+  const partMap = {};
+  for (const p of parts) {
+    partMap[p.type] = p.value;
+  }
+  const melbUTC = Date.UTC(
+    Number(partMap.year),
+    Number(partMap.month) - 1,
+    Number(partMap.day),
+    Number(partMap.hour),
+    Number(partMap.minute),
+    Number(partMap.second)
+  );
+  return Math.round((melbUTC - date.getTime()) / (3600 * 1000));
+}
+
+function getMelbourneMonthUTCBounds(year, month) {
+  const estDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+  const offsetHours = getMelbourneOffsetHours(estDate);
+  const startUTC = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0) - offsetHours * 3600 * 1000);
+  
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const estEndDate = new Date(Date.UTC(year, month - 1, lastDay, 23, 59, 59));
+  const endOffsetHours = getMelbourneOffsetHours(estEndDate);
+  const endUTC = new Date(Date.UTC(year, month - 1, lastDay, 23, 59, 59) - endOffsetHours * 3600 * 1000);
+  
+  return {
+    DateStart: startUTC.toISOString().replace(".000Z", "Z"),
+    DateEnd: endUTC.toISOString().replace(".000Z", "Z")
+  };
+}
+
+function getCurrentMelbourneYearMonth() {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Australia/Melbourne",
+    year: "numeric",
+    month: "numeric"
+  });
+  const parts = formatter.formatToParts(new Date());
+  const partMap = {};
+  for (const p of parts) {
+    partMap[p.type] = p.value;
+  }
+  return {
+    year: Number(partMap.year),
+    month: Number(partMap.month)
+  };
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const debugMode = args.includes("--debug");
 
-  const nonFlagArgs = args.filter(arg => arg !== "--debug");
+  let backfillMonths = 0;
+  const backfillFlag = args.includes("--backfill");
+  const backfillMonthsArg = args.find(arg => arg.startsWith("--backfill-months="));
+
+  if (backfillMonthsArg) {
+    const match = backfillMonthsArg.match(/^--backfill-months=(\d+)$/);
+    if (!match) {
+      throw new Error(`Invalid --backfill-months argument format. Expected --backfill-months=N`);
+    }
+    backfillMonths = parseInt(match[1], 10);
+  } else if (backfillFlag) {
+    backfillMonths = 72;
+  }
+
+  if (backfillMonths > 120) {
+    throw new Error(`Maximum backfill limit is 120 months. Requested: ${backfillMonths}`);
+  }
+
+  const nonFlagArgs = args.filter(arg => 
+    arg !== "--debug" && 
+    arg !== "--backfill" && 
+    !arg.startsWith("--backfill-months=")
+  );
   const productArg = nonFlagArgs[0] || "tattslotto";
 
   // Validate productArg or map it
@@ -265,10 +403,69 @@ async function main() {
     process.exit(1);
   }
 
+  let skippedFailedMonths = 0;
+  const historicalDraws = [];
+
+  if (backfillMonths > 0) {
+    const { year: currentYear, month: currentMonth } = getCurrentMelbourneYearMonth();
+    console.log(`Backfill requested: ${backfillMonths} months from ${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+    
+    // Generate list of months
+    const targetMonths = [];
+    let y = currentYear;
+    let m = currentMonth;
+    for (let i = 0; i < backfillMonths; i++) {
+      targetMonths.push({ year: y, month: m });
+      m--;
+      if (m === 0) {
+        m = 12;
+        y--;
+      }
+    }
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    for (const target of targetMonths) {
+      const { DateStart, DateEnd } = getMelbourneMonthUTCBounds(target.year, target.month);
+      console.log(`Fetching historical draws for ${target.year}-${String(target.month).padStart(2, '0')} (${DateStart} to ${DateEnd})...`);
+      
+      try {
+        const histData = await fetchHistoricalResults(DateStart, DateEnd);
+        
+        if (histData && histData.Success === false) {
+          throw new Error(`API returned Success: false. ErrorInfo: ${JSON.stringify(histData.ErrorInfo)}`);
+        }
+        
+        const rawDraws = extractDrawArray(histData);
+        let monthDrawsFetched = 0;
+        
+        for (const rawDraw of rawDraws) {
+          try {
+            const normalised = normaliseDraw(rawDraw);
+            historicalDraws.push(normalised);
+            monthDrawsFetched++;
+          } catch (err) {
+            console.warn(`Warning: Skipped invalid draw row in ${target.year}-${String(target.month).padStart(2, '0')}: ${err.message}`);
+          }
+        }
+        
+        console.log(`Fetched ${monthDrawsFetched} draw(s) for ${target.year}-${String(target.month).padStart(2, '0')}`);
+      } catch (err) {
+        console.warn(`Warning: Failed to fetch/parse historical data for ${target.year}-${String(target.month).padStart(2, '0')}: ${err.message}`);
+        skippedFailedMonths++;
+      }
+      
+      // Delay around 200ms
+      await delay(200);
+    }
+  }
+
+  const allNewDraws = [...normalisedDraws, ...historicalDraws];
+
   if (debugMode) {
     printDebugInfo(data);
     console.log("\nNormalized Rows Preview (Success):");
-    console.log(JSON.stringify(normalisedDraws.map(d => ({
+    console.log(JSON.stringify(allNewDraws.map(d => ({
       drawNo: d.drawNo,
       date: d.date,
       numbers: [d.n1, d.n2, d.n3, d.n4, d.n5, d.n6],
@@ -317,7 +514,7 @@ async function main() {
   }
 
   // Merge new draws
-  for (const draw of normalisedDraws) {
+  for (const draw of allNewDraws) {
     existingDraws.set(draw.drawNo, {
       drawNo: draw.drawNo,
       date: draw.date,
@@ -345,16 +542,23 @@ async function main() {
   await fs.writeFile(CSV_PATH, csvLines.join("\n") + "\n", "utf8");
 
   // Log concise summary
-  const fetchedSorted = [...normalisedDraws].sort((a, b) => b.drawNo - a.drawNo);
-  const latest = fetchedSorted[0];
+  const fetchedSorted = [...allNewDraws].sort((a, b) => b.drawNo - a.drawNo);
+  const latest = fetchedSorted[0] || {};
 
   console.log("\n=== TattsLotto Fetch Summary ===");
-  console.log(`Product:                 ${latest.productId}`);
-  console.log(`Draws Returned:          ${normalisedDraws.length}`);
-  console.log(`Latest Draw Number:      ${latest.drawNo}`);
-  console.log(`Latest Draw Date:        ${latest.date}`);
-  console.log(`Winning Numbers:         ${[latest.n1, latest.n2, latest.n3, latest.n4, latest.n5, latest.n6].join(", ")}`);
-  console.log(`Supplementary Numbers:   ${[latest.s1, latest.s2].join(", ")}`);
+  console.log(`Product:                 ${latest.productId || "TattsLotto"}`);
+  console.log(`Latest Draws Returned:   ${normalisedDraws.length}`);
+  if (backfillMonths > 0) {
+    console.log(`Backfill Months Req:     ${backfillMonths}`);
+    console.log(`Hist Draws Fetched:      ${historicalDraws.length}`);
+    console.log(`Skipped/Failed Months:   ${skippedFailedMonths}`);
+  }
+  console.log(`Latest Draw Number:      ${latest.drawNo || "N/A"}`);
+  console.log(`Latest Draw Date:        ${latest.date || "N/A"}`);
+  if (latest.drawNo) {
+    console.log(`Winning Numbers:         ${[latest.n1, latest.n2, latest.n3, latest.n4, latest.n5, latest.n6].join(", ")}`);
+    console.log(`Supplementary Numbers:   ${[latest.s1, latest.s2].join(", ")}`);
+  }
   console.log("================================\n");
   console.log(`Saved merged and sorted results to ${CSV_PATH} (Total draws: ${sortedDraws.length})`);
 }
