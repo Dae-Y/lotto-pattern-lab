@@ -1,6 +1,8 @@
 import { countOddEven, sum, countConsecutivePairs, countRepeatsFromPrevious } from "../utils/numberUtils.js";
 
 export function getOddEvenDistribution(draws) {
+  if (!draws || draws.length === 0) return [];
+  const totalCount = draws[0].mainNumbers.length;
   const counts = new Map();
 
   draws.forEach((draw, index) => {
@@ -19,7 +21,7 @@ export function getOddEvenDistribution(draws) {
   });
 
   return Array.from(counts.values()).map(item => ({
-    label: `${item.oddCount} odd / ${7 - item.oddCount} even`,
+    label: `${item.oddCount} odd / ${totalCount - item.oddCount} even`,
     count: item.count,
     isLatest: item.isLatest,
     sortKey: item.oddCount

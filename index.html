@@ -24,22 +24,34 @@
   <header class="app-header">
     <div class="app-header-inner">
       <div class="app-header-copy">
-        <p class="eyebrow" id="headerEyebrow">Lotterywest CSV Visualiser</p>
+        <p class="eyebrow" id="headerEyebrow">Lotto Data Visualiser</p>
         <h1 id="headerTitle">Lotto Pattern Lab</h1>
         <p class="subtitle" id="headerSubtitle">
           Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.
         </p>
       </div>
 
-      <div class="country-switcher" role="group" aria-label="Country selector">
-        <button class="country-btn active" type="button" data-country="australia">
-          <img src="https://flagcdn.com/24x18/au.png" class="country-flag" width="20" alt="" aria-hidden="true">
-          <span>Australia</span>
-        </button>
-        <button class="country-btn" type="button" data-country="korea">
-          <img src="https://flagcdn.com/24x18/kr.png" class="country-flag" width="20" alt="" aria-hidden="true">
-          <span>한국</span>
-        </button>
+      <div class="country-switcher-container">
+        <div class="country-switcher" role="group" aria-label="Country selector">
+          <button class="country-btn active" type="button" data-country="australia">
+            <img src="https://flagcdn.com/24x18/au.png" class="country-flag" width="20" alt="" aria-hidden="true">
+            <span>Australia</span>
+          </button>
+          <button class="country-btn" type="button" data-country="korea">
+            <img src="https://flagcdn.com/24x18/kr.png" class="country-flag" width="20" alt="" aria-hidden="true">
+            <span>한국</span>
+          </button>
+        </div>
+        <div class="region-switcher" id="regionSwitcher" role="group" aria-label="Region selector" hidden>
+          <button class="region-btn active" type="button" data-region="wa">
+            <span class="region-icon">🦢</span>
+            <span>WA</span>
+          </button>
+          <button class="region-btn" type="button" data-region="vic">
+            <span class="region-icon">⭐</span>
+            <span>VIC</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>

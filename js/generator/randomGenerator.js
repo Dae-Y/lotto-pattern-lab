@@ -5,20 +5,24 @@ export function generateRandomEntries(config, count = 5) {
 export function generateRandomEntry(config) {
   const mainNumbers = pickUniqueNumbers(config.main.range, config.main.count);
 
-  let secondaryNumbers;
+  let secondaryNumbers = [];
 
-  if (config.secondary.sharesMainGrid) {
-    const excluded = new Set(mainNumbers);
-    secondaryNumbers = pickUniqueNumbers(
-      config.secondary.range,
-      config.secondary.count,
-      excluded,
-    );
-  } else {
-    secondaryNumbers = pickUniqueNumbers(
-      config.secondary.range,
-      config.secondary.count,
-    );
+  if (config.secondary) {
+    if (config.secondary.drawOnly) {
+      secondaryNumbers = [];
+    } else if (config.secondary.sharesMainGrid) {
+      const excluded = new Set(mainNumbers);
+      secondaryNumbers = pickUniqueNumbers(
+        config.secondary.range,
+        config.secondary.count,
+        excluded,
+      );
+    } else {
+      secondaryNumbers = pickUniqueNumbers(
+        config.secondary.range,
+        config.secondary.count,
+      );
+    }
   }
 
   return {

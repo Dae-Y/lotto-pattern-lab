@@ -5,6 +5,10 @@ export const COUNTRIES = [
     flag: "🇦🇺",
     locale: "en-AU",
     defaultGameId: "5130",
+    regions: [
+      { id: "wa", label: "WA / Lotterywest" },
+      { id: "vic", label: "VIC / The Lott" },
+    ],
   },
   {
     id: "korea",

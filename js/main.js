@@ -25,6 +25,7 @@ const PREF_KEY = "lottoPatternLab.preferences";
 
 const state = {
   activeCountry: "australia",
+  activeRegion: "wa",
   activeGameId: DEFAULT_GAME_ID,
   drawsByGameId: {},
   sourceByGameId: {},
@@ -37,6 +38,8 @@ const elements = {
   headerTitle: document.querySelector("#headerTitle"),
   headerSubtitle: document.querySelector("#headerSubtitle"),
   countryBtns: document.querySelectorAll(".country-btn"),
+  regionSwitcher: document.querySelector("#regionSwitcher"),
+  regionBtns: document.querySelectorAll(".region-btn"),
 
   tabs: document.querySelector("#tabs"),
   csvInput: document.querySelector("#csvInput"),
@@ -82,6 +85,7 @@ async function init() {
     btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
   });
 
+  updateRegionSwitcherUi();
   renderAll();
 
   if (!state.drawsByGameId[state.activeGameId]) {
@@ -92,6 +96,12 @@ async function init() {
   elements.countryBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       setActiveCountry(btn.dataset.country);
+    });
+  });
+
+  elements.regionBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      setActiveRegion(btn.dataset.region);
     });
   });
 
@@ -129,6 +139,7 @@ function loadPreferences() {
     const pref = JSON.parse(raw);
 
     if (pref.activeCountry) state.activeCountry = pref.activeCountry;
+    if (pref.activeRegion) state.activeRegion = pref.activeRegion;
     if (pref.activeGameId) state.activeGameId = pref.activeGameId;
     if (pref.recentDrawLimit !== undefined) {
       const parsedLimit = Number(pref.recentDrawLimit);
@@ -146,6 +157,7 @@ function savePreferences() {
   try {
     const pref = {
       activeCountry: state.activeCountry,
+      activeRegion: state.activeRegion,
       activeGameId: state.activeGameId,
       recentDrawLimit: state.recentDrawLimit,
       recentViewMode: state.recentViewMode,
@@ -165,6 +177,13 @@ function getDefaultGameIdForCountry(countryId) {
   return country?.defaultGameId ?? DEFAULT_GAME_ID;
 }
 
+function getDefaultGameIdForRegion(regionId) {
+  if (regionId === "vic") {
+    return "au-vic-tattslotto";
+  }
+  return "5130";
+}
+
 function isValidCountry(countryId) {
   return COUNTRIES.some((country) => country.id === countryId);
 }
@@ -174,13 +193,28 @@ function isGameInCountry(gameId, countryId) {
   return Boolean(game && game.country === countryId);
 }
 
+function isGameInRegion(gameId, regionId) {
+  const game = getGameConfig(gameId);
+  return Boolean(game && game.country === "australia" && game.region === regionId);
+}
+
 function validateState() {
   if (!isValidCountry(state.activeCountry)) {
     state.activeCountry = "australia";
   }
 
-  if (!isGameInCountry(state.activeGameId, state.activeCountry)) {
-    state.activeGameId = getDefaultGameIdForCountry(state.activeCountry);
+  if (state.activeCountry === "australia") {
+    if (!state.activeRegion || !["wa", "vic"].includes(state.activeRegion)) {
+      state.activeRegion = "wa";
+    }
+    if (!isGameInRegion(state.activeGameId, state.activeRegion)) {
+      state.activeGameId = getDefaultGameIdForRegion(state.activeRegion);
+    }
+  } else {
+    state.activeRegion = "";
+    if (!isGameInCountry(state.activeGameId, state.activeCountry)) {
+      state.activeGameId = getDefaultGameIdForCountry(state.activeCountry);
+    }
   }
 
   if (!Number.isInteger(state.recentDrawLimit) || state.recentDrawLimit < 1) {
@@ -193,6 +227,11 @@ function validateState() {
 }
 
 function getVisibleGames() {
+  if (state.activeCountry === "australia") {
+    return GAME_CONFIGS.filter(
+      (game) => game.country === "australia" && game.region === state.activeRegion
+    );
+  }
   return GAME_CONFIGS.filter((game) => game.country === state.activeCountry);
 }
 
@@ -203,7 +242,15 @@ function getActiveCopy() {
 
 function setActiveCountry(countryId) {
   state.activeCountry = countryId;
-  state.activeGameId = getDefaultGameIdForCountry(countryId);
+  if (countryId === "australia") {
+    if (!state.activeRegion || !["wa", "vic"].includes(state.activeRegion)) {
+      state.activeRegion = "wa";
+    }
+    state.activeGameId = getDefaultGameIdForRegion(state.activeRegion);
+  } else {
+    state.activeRegion = "";
+    state.activeGameId = getDefaultGameIdForCountry(countryId);
+  }
 
   validateState();
   savePreferences();
@@ -212,11 +259,42 @@ function setActiveCountry(countryId) {
     btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
   });
 
+  updateRegionSwitcherUi();
+
   updateStaticUiText();
   renderAll();
 
   if (!state.drawsByGameId[state.activeGameId]) {
     loadSampleCsvForActiveGame({ force: true });
+  }
+}
+
+function setActiveRegion(regionId) {
+  state.activeRegion = regionId;
+  state.activeGameId = getDefaultGameIdForRegion(regionId);
+
+  validateState();
+  savePreferences();
+
+  updateRegionSwitcherUi();
+
+  renderAll();
+
+  if (!state.drawsByGameId[state.activeGameId]) {
+    loadSampleCsvForActiveGame({ force: true });
+  }
+}
+
+function updateRegionSwitcherUi() {
+  if (!elements.regionSwitcher) return;
+
+  if (state.activeCountry === "australia") {
+    elements.regionSwitcher.hidden = false;
+    elements.regionBtns.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.region === state.activeRegion);
+    });
+  } else {
+    elements.regionSwitcher.hidden = true;
   }
 }
 
@@ -230,9 +308,16 @@ function handleTabChange(gameId) {
 
   state.activeGameId = gameId;
   state.activeCountry = config.country;
+  if (config.country === "australia") {
+    state.activeRegion = config.region;
+  } else {
+    state.activeRegion = "";
+  }
 
   validateState();
   savePreferences();
+  
+  updateRegionSwitcherUi();
   renderAll();
 
   if (!state.drawsByGameId[gameId]) {
@@ -504,16 +589,32 @@ function handleCsvUpload(event) {
 
     if (detectedGameId !== state.activeGameId) {
       state.activeGameId = detectedGameId;
-      // also change the country tab if needed
+      // also change the country/region switcher if needed
       const detectedConfig = getGameConfig(detectedGameId);
-      if (detectedConfig && detectedConfig.country !== state.activeCountry) {
-        state.activeCountry = detectedConfig.country;
-        savePreferences();
+      if (detectedConfig) {
+        let changed = false;
+        if (detectedConfig.country !== state.activeCountry) {
+          state.activeCountry = detectedConfig.country;
+          changed = true;
+        }
+        if (detectedConfig.country === "australia" && detectedConfig.region !== state.activeRegion) {
+          state.activeRegion = detectedConfig.region;
+          changed = true;
+        } else if (detectedConfig.country !== "australia" && state.activeRegion !== "") {
+          state.activeRegion = "";
+          changed = true;
+        }
 
-        elements.countryBtns.forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
-        });
-        updateStaticUiText();
+        if (changed) {
+          validateState();
+          savePreferences();
+
+          elements.countryBtns.forEach(btn => {
+            btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
+          });
+          updateStaticUiText();
+          updateRegionSwitcherUi();
+        }
       }
     }
 

@@ -27,12 +27,16 @@ jobs:
         run: |
           node --check scripts/fetch-lotterywest.mjs
           node --check scripts/fetch-korea-lotto.mjs
+          node --check scripts/fetch-thelott.mjs
 
       - name: Update Australia Lotterywest data
         run: node scripts/fetch-lotterywest.mjs all
 
       - name: Update Korea Lotto 6/45 data
         run: node scripts/fetch-korea-lotto.mjs mirror
+
+      - name: Update Victoria The Lott TattsLotto data
+        run: node scripts/fetch-thelott.mjs tattslotto
 
       - name: Commit updated datasets
         run: |

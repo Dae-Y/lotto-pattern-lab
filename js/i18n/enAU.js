@@ -2,7 +2,7 @@ export const enAU = {
   locale: "en-AU",
   officialLinkLabel: "Official charts",
   header: {
-    eyebrow: "Lotterywest CSV Visualiser",
+    eyebrow: "Lotto Data Visualiser",
     title: "Lotto Pattern Lab",
     subtitle: "Upload lottery result CSV files, visualise recent draws, and explore simple number patterns.",
   },
@@ -129,7 +129,7 @@ export const enAU = {
   },
   footer: {
     disclaimer1: "Lottery results data used in this project is based on publicly available Lotterywest CSV result files.",
-    disclaimer2: "This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest.",
+    disclaimer2: "This website is an independent, fan-made data visualisation and pattern exploration tool. It is not affiliated with, endorsed by, or operated by Lotterywest, The Lott, Tatts, or Donghaeng Lottery.",
     disclaimer3: "Lottery numbers are random by nature. Any analysis, statistics, or generated number suggestions are for reference and entertainment purposes only and do not guarantee future results.",
     disclaimer4: "Users should check the official Lotterywest website for final and authoritative results, game rules, prize information, and eligibility requirements.",
     disclaimer5: "Lotterywest names, game names, data, and related materials belong to their respective owners.",
