@@ -328,6 +328,10 @@ function handleTabChange(gameId) {
 function updateStaticUiText() {
   const copy = getActiveCopy();
 
+  if (copy.locale) {
+    document.documentElement.lang = copy.locale.split("-")[0];
+  }
+
   if (elements.headerEyebrow) elements.headerEyebrow.textContent = copy.header.eyebrow;
   if (elements.headerTitle) elements.headerTitle.textContent = copy.header.title;
   if (elements.headerSubtitle) elements.headerSubtitle.textContent = copy.header.subtitle;

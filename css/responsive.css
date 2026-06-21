@@ -18,11 +18,15 @@
   .app-header h1 {
     font-size: 30px;
   }
+
+  html[lang="ko"] .app-header h1 {
+    font-size: 28px;
+  }
 }
 
 @media (max-width: 800px) {
   .app-header {
-    min-height: 282px;
+    min-height: 276px;
   }
 
   .app-header-inner {
