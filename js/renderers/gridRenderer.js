@@ -34,6 +34,9 @@ export function renderRecentResults(container, draws, config, options = {}, copy
   }
 
   if (viewMode === "compact") {
+    const legend = createLegend(config, copy);
+    container.appendChild(legend);
+
     const scrollArea = document.createElement("div");
     scrollArea.className = "recent-scroll-area";
     scrollArea.appendChild(renderCompactView(recentDraws, config, copy));
@@ -101,7 +104,7 @@ function renderCompactView(draws, config, copy) {
     // Separator
     const separator = document.createElement("span");
     separator.className = "compact-separator";
-    separator.textContent = config.secondary.label;
+    separator.textContent = config.display?.compactSecondaryLabel || config.secondary.label;
     ballRow.appendChild(separator);
 
     draw.secondaryNumbers.forEach((number) => {

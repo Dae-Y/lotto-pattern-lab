@@ -26,6 +26,7 @@ export const KOREA_GAMES = [
       mainMark: "W",
       secondaryMark: "B",
       secondaryClass: "supplementary-hit",
+      compactSecondaryLabel: "보너스",
     },
   },
 ];

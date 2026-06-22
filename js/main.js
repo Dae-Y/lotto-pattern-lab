@@ -80,6 +80,7 @@ async function init() {
 
   updateStaticUiText();
   syncRecentDrawControls();
+  syncRecentViewMode();
 
   elements.countryBtns.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.country === state.activeCountry);
@@ -393,6 +394,13 @@ function syncRecentDrawControls() {
   }
 }
 
+function syncRecentViewMode() {
+  if (elements.tableViewBtn && elements.compactViewBtn) {
+    elements.tableViewBtn.classList.toggle("active", state.recentViewMode === "table");
+    elements.compactViewBtn.classList.toggle("active", state.recentViewMode === "compact");
+  }
+}
+
 function handleRecentDrawPresetChange() {
   if (!elements.recentDrawPreset || !elements.recentDrawCustomInput) {
     return;
@@ -452,6 +460,8 @@ function renderRecent() {
   const draws = state.drawsByGameId[state.activeGameId] ?? [];
   const copy = getActiveCopy();
 
+  syncRecentViewMode();
+
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,
@@ -481,6 +491,7 @@ function renderAll() {
 
   renderTabs(elements.tabs, visibleGames, state.activeGameId, handleTabChange);
   renderCompactMeta(elements.compactMeta, draws, config, copy);
+  syncRecentViewMode();
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,

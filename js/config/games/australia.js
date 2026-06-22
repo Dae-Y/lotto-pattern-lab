@@ -28,6 +28,7 @@ export const AUSTRALIA_GAMES = [
       mainMark: "W",
       secondaryMark: "S",
       secondaryClass: "supplementary-hit",
+      compactSecondaryLabel: "S",
     },
   },
   {
@@ -59,6 +60,7 @@ export const AUSTRALIA_GAMES = [
       mainMark: "W",
       secondaryMark: "P",
       secondaryClass: "secondary-hit",
+      compactSecondaryLabel: "P",
     },
   },
   {
@@ -90,6 +92,7 @@ export const AUSTRALIA_GAMES = [
       mainMark: "W",
       secondaryMark: "S",
       secondaryClass: "supplementary-hit",
+      compactSecondaryLabel: "S",
     },
   },
   {
@@ -119,6 +122,7 @@ export const AUSTRALIA_GAMES = [
       mainMark: "W",
       secondaryMark: "S",
       secondaryClass: "supplementary-hit",
+      compactSecondaryLabel: "S",
     },
   },
 ];
