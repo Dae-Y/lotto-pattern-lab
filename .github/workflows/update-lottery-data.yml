@@ -36,7 +36,10 @@ jobs:
         run: node scripts/fetch-korea-lotto.mjs mirror
 
       - name: Update Victoria The Lott TattsLotto data
-        run: node scripts/fetch-thelott.mjs tattslotto
+        run: |
+          node scripts/fetch-thelott.mjs tattslotto || {
+            echo "::warning::TattsLotto update failed. The Lott may block GitHub Actions runners. TattsLotto can be updated manually from a local machine. Continuing with other dataset updates."
+          }
 
       - name: Commit updated datasets
         run: |
