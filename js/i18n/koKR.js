@@ -17,6 +17,8 @@ export const koKR = {
     drawCount: "표시 회차 수",
     tableView: "표 보기",
     compactView: "간단히 보기",
+    orderInactive: "번호 정렬",
+    orderActive: "원래 순서",
     drawCountOptions: {
       custom: "직접 입력",
     },

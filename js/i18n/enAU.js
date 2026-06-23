@@ -17,6 +17,8 @@ export const enAU = {
     drawCount: "Draw count",
     tableView: "Table View",
     compactView: "Compact View",
+    orderInactive: "Order numbers",
+    orderActive: "Original order",
     drawCountOptions: {
       custom: "Custom",
     },

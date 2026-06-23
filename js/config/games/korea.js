@@ -9,6 +9,7 @@ export const KOREA_GAMES = [
     parserType: "korea-lotto-645",
     sourceLabel: "동행복권 로또 6/45 회차별 결과 기반 공개 데이터",
     officialUrl: "https://www.dhlottery.co.kr/lt645/result",
+    supportsNumberOrderToggle: false,
     main: {
       label: "당첨번호",
       marker: "W",
