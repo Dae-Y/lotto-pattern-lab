@@ -11,6 +11,7 @@ export const AUSTRALIA_GAMES = [
     sourceLabel: "Lotterywest public results data",
     officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1474,
+    supportsNumberOrderToggle: true,
     main: {
       label: "Winning",
       range: 47,
@@ -43,6 +44,7 @@ export const AUSTRALIA_GAMES = [
     sourceLabel: "Lotterywest public results data",
     officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1144,
+    supportsNumberOrderToggle: true,
     main: {
       label: "Winning",
       range: 35,
@@ -75,6 +77,7 @@ export const AUSTRALIA_GAMES = [
     sourceLabel: "Lotterywest public results data",
     officialUrl: "https://www.lotterywest.wa.gov.au/results/frequency-charts",
     currentFormatStartDraw: 1691,
+    supportsNumberOrderToggle: true,
     main: {
       label: "Winning",
       range: 44,
@@ -106,6 +109,7 @@ export const AUSTRALIA_GAMES = [
     fileName: "au-vic-tattslotto.csv",
     sourceLabel: "The Lott / Tatts public results data",
     officialUrl: "https://www.thelott.com/tattslotto/results",
+    supportsNumberOrderToggle: true,
     main: {
       label: "Winning",
       range: 45,

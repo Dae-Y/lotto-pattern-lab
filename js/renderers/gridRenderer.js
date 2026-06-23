@@ -9,7 +9,7 @@ import { range } from "../utils/numberUtils.js";
  * @param {Object} options - { limit: number, viewMode: "table"|"compact" }
  */
 export function renderRecentResults(container, draws, config, options = {}, copy) {
-  const { limit = 10, viewMode = "table" } = options;
+  const { limit = 10, viewMode = "table", orderAscending = false } = options;
 
   container.innerHTML = "";
 
@@ -39,7 +39,7 @@ export function renderRecentResults(container, draws, config, options = {}, copy
 
     const scrollArea = document.createElement("div");
     scrollArea.className = "recent-scroll-area";
-    scrollArea.appendChild(renderCompactView(recentDraws, config, copy));
+    scrollArea.appendChild(renderCompactView(recentDraws, config, copy, orderAscending));
     container.appendChild(scrollArea);
   } else {
     const legend = createLegend(config, copy);
@@ -70,7 +70,7 @@ export function renderRecentResults(container, draws, config, options = {}, copy
 
 /* ── Compact View ── */
 
-function renderCompactView(draws, config, copy) {
+function renderCompactView(draws, config, copy, orderAscending = false) {
   const list = document.createElement("div");
   list.className = "compact-results";
 
@@ -94,7 +94,15 @@ function renderCompactView(draws, config, copy) {
     const ballRow = document.createElement("div");
     ballRow.className = "compact-ball-row";
 
-    draw.mainNumbers.forEach((number) => {
+    let mainNumbers = draw.mainNumbers;
+    let secondaryNumbers = draw.secondaryNumbers;
+
+    if (orderAscending) {
+      mainNumbers = [...mainNumbers].sort((a, b) => a - b);
+      secondaryNumbers = [...secondaryNumbers].sort((a, b) => a - b);
+    }
+
+    mainNumbers.forEach((number) => {
       const ball = document.createElement("span");
       ball.className = "lottery-ball compact-result-ball main-ball";
       ball.textContent = number;
@@ -107,7 +115,7 @@ function renderCompactView(draws, config, copy) {
     separator.textContent = config.display?.compactSecondaryLabel || config.secondary.label;
     ballRow.appendChild(separator);
 
-    draw.secondaryNumbers.forEach((number) => {
+    secondaryNumbers.forEach((number) => {
       const ball = document.createElement("span");
       ball.className = `lottery-ball compact-result-ball ${secondaryClass}`;
       ball.textContent = number;

@@ -31,6 +31,7 @@ const state = {
   sourceByGameId: {},
   recentDrawLimit: 10,
   recentViewMode: "table",
+  recentOrderAscending: false,
 };
 
 const elements = {
@@ -53,6 +54,7 @@ const elements = {
   recentDrawCustomInput: document.querySelector("#recentDrawCustomInput"),
   tableViewBtn: document.querySelector("#tableViewBtn"),
   compactViewBtn: document.querySelector("#compactViewBtn"),
+  orderNumbersBtn: document.querySelector("#orderNumbersBtn"),
   stats: document.querySelector("#stats"),
   patternInsights: document.querySelector("#patternInsights"),
   userNumbersAnalyser: document.querySelector("#userNumbersAnalyser"),
@@ -131,6 +133,12 @@ async function init() {
   elements.compactViewBtn.addEventListener("click", () => {
     setViewMode("compact");
   });
+
+  if (elements.orderNumbersBtn) {
+    elements.orderNumbersBtn.addEventListener("click", () => {
+      toggleRecentOrder();
+    });
+  }
 }
 
 function loadPreferences() {
@@ -149,6 +157,9 @@ function loadPreferences() {
       }
     }
     if (pref.recentViewMode) state.recentViewMode = pref.recentViewMode;
+    if (pref.recentOrderAscending !== undefined) {
+      state.recentOrderAscending = Boolean(pref.recentOrderAscending);
+    }
   } catch (e) {
     console.error("Failed to load preferences", e);
   }
@@ -162,6 +173,7 @@ function savePreferences() {
       activeGameId: state.activeGameId,
       recentDrawLimit: state.recentDrawLimit,
       recentViewMode: state.recentViewMode,
+      recentOrderAscending: state.recentOrderAscending,
     };
     localStorage.setItem(PREF_KEY, JSON.stringify(pref));
   } catch (e) {
@@ -364,6 +376,7 @@ function updateStaticUiText() {
 
   updateRecentDrawPresetLabels();
   syncRecentDrawControls();
+  updateOrderNumbersBtnText();
 }
 
 function updateRecentDrawPresetLabels() {
@@ -399,6 +412,30 @@ function syncRecentViewMode() {
     elements.tableViewBtn.classList.toggle("active", state.recentViewMode === "table");
     elements.compactViewBtn.classList.toggle("active", state.recentViewMode === "compact");
   }
+
+  if (elements.orderNumbersBtn) {
+    const config = getGameConfig(state.activeGameId);
+    const supportsToggle = config && config.supportsNumberOrderToggle !== false;
+    elements.orderNumbersBtn.style.display = (state.recentViewMode === "compact" && supportsToggle) ? "inline-flex" : "none";
+    updateOrderNumbersBtnText();
+  }
+}
+
+function updateOrderNumbersBtnText() {
+  if (!elements.orderNumbersBtn) return;
+  const copy = getActiveCopy();
+  const text = state.recentOrderAscending
+    ? (copy.recent?.orderActive ?? "Original order")
+    : (copy.recent?.orderInactive ?? "Order numbers");
+  elements.orderNumbersBtn.textContent = text;
+  elements.orderNumbersBtn.classList.toggle("active", state.recentOrderAscending);
+}
+
+function toggleRecentOrder() {
+  state.recentOrderAscending = !state.recentOrderAscending;
+  savePreferences();
+  updateOrderNumbersBtnText();
+  renderRecent();
 }
 
 function handleRecentDrawPresetChange() {
@@ -465,6 +502,7 @@ function renderRecent() {
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,
+    orderAscending: state.recentOrderAscending,
   }, copy);
 }
 
@@ -495,6 +533,7 @@ function renderAll() {
   renderRecentResults(elements.recentGrid, draws, config, {
     limit: state.recentDrawLimit,
     viewMode: state.recentViewMode,
+    orderAscending: state.recentOrderAscending,
   }, copy);
   renderStats(elements.stats, draws, config, copy);
 
