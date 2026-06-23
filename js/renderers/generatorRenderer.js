@@ -22,6 +22,11 @@ export function renderGenerator(container, config, copy) {
   const controls = document.createElement("div");
   controls.className = "generator-controls";
 
+  const label = document.createElement("span");
+  label.className = "generator-label";
+  label.textContent = gen.generate || "Generate:";
+  controls.appendChild(label);
+
   // Scrollable results area
   const scrollArea = document.createElement("div");
   scrollArea.className = "generated-scroll-area";
@@ -31,7 +36,7 @@ export function renderGenerator(container, config, copy) {
 
   scrollArea.appendChild(resultList);
 
-  const generationOptions = [1, 5, 10, 30, 100];
+  const generationOptions = [1, 5, 10, 30];
 
   generationOptions.forEach((count) => {
     const button = document.createElement("button");

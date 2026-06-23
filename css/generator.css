@@ -24,7 +24,15 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+  align-items: center;
   max-width: 100%;
+}
+
+.generator-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .generator-btn {
