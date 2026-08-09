@@ -1,6 +1,24 @@
 [
   {
     "game": "korea_lotto_645",
+    "drawNo": 1236,
+    "date": "2026-08-08",
+    "numbers": [
+      12,
+      18,
+      21,
+      29,
+      34,
+      38
+    ],
+    "bonus": 10,
+    "totalSales": 114070835000,
+    "firstPrizeAmount": 2441919375,
+    "firstPrizeWinners": 11,
+    "firstPrizeTotal": 26861113125
+  },
+  {
+    "game": "korea_lotto_645",
     "drawNo": 1235,
     "date": "2026-08-01",
     "numbers": [
